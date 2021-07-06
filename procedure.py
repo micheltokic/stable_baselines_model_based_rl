@@ -4,6 +4,9 @@
 # --- obere schritte können zusammengefasst werden
 # 4. run/step
 
+# def sample(gym_environment_name)
+#   return config_file, input
+
 # def train(input, config_file)
 #     tensorflow/pytorch training on input data set
 #     return exported_model_file
