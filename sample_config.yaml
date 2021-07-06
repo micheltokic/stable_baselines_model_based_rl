@@ -3,4 +3,5 @@ output_dimension: 5
 reinforcement_learning_algorithm: 'PPO'
 model_type: 'MLP'
 input_file_name: 'train.csv'
+train_test_ration: 0.2
 lags: 'keine_ahnung'
