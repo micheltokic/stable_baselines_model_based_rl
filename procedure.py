@@ -5,25 +5,24 @@
 # 4. run/step
 
 # def train(input, config_file)
-#     exported_model_file
-
+#     tensorflow/pytorch training on input data set
+#     return exported_model_file
+#
 # def create_trained_model(gym_environment_name, steps, config_file)
 #      env = gym.make(gym_environment_name)
-#      exported_model_file
-
-# def step(model, gym_environment_name)
-
+#      return train(input, config_file)
+#
+#   Wie bei gym environments
+# def step(model)
+#
+# 
 # def run(model, gym_environment_name)
-#     gym_ui
-
-# def create (model, gym_environment_name)
-#     env
-
-# def create (gym_environment_name, steps, config_file)
-#     env
-
-# def create (input, config_file)
-#     env
-
+# return simulated_ui
+#
+#   Teil des Frameworks oder nur zum Testen ?
+# def train_against(model)
+# return train_against_model
+#   
+#   Teil des Frameworks oder nur zum Testen ?
 # def plot(daten)
 #     plot
