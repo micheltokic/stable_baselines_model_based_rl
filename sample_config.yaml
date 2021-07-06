@@ -1,0 +1,6 @@
+input_dimension: 5
+output_dimension: 5
+reinforcement_learning_algorithm: 'PPO'
+model_type: 'MLP'
+input_file_name: 'train.csv'
+lags: 'keine_ahnung'
