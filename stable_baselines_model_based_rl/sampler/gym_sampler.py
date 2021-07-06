@@ -29,30 +29,6 @@ def sample_input_and_config(gym_environment_name, episode_count=20, max_steps=10
 
     env.reset()
 
-    #dim_input = action_space.n
-    # dim_output = observation_space.shape
-
-    #   np.prod(env.observation_space.nvec)
-    #   which returns 16 which is the number of combinations for that space
-
-    input_dimension = get_dimension(action_space) + get_dimension(observation_space)
-    output_dimension = get_dimension(observation_space)
-
-    CART_POS="cartPos"
-    CART_VEL="cartVel"
-    PEND_POS="pendPos"
-    PEND_VEL="pendVel"
-    EPISODE="episode"
-    STEP="step"
-    ACTION="action"
-
-    ### CREATE EMPTY Pandas dataset
-    #d = {
-     #   CART_POS:[], CART_VEL:[], 
-      #  PEND_POS:[], PEND_VEL:[],
-       # EPISODE:[], STEP:[], ACTION:[]
-        #}
-
     d = {}
     input_col_names = []
 
@@ -85,10 +61,6 @@ def sample_input_and_config(gym_environment_name, episode_count=20, max_steps=10
             obs_dic["ACTION"] = int(action)
 
             df = df.append(obs_dic, ignore_index=True)
-            
-            #df = df.append ({CART_POS:obs[0], CART_VEL:obs[1], 
-             #               PEND_POS:obs[2], PEND_VEL:obs[3],
-              #              EPISODE:episode, STEP:step, ACTION:action}, ignore_index=True)
             
             obs, reward, done, _ = env.step(action)
             
