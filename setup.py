@@ -1,7 +1,6 @@
 from setuptools import setup
 
-setup(name='coloring',
+setup(name='stable_baselines_model_based_rl',
       version='0.0.1',
-      # for visualization also install matplotlib
-      install_requires=['gym', 'stable-baselines3[extra]']
+      install_requires=['gym', 'stable-baselines3[extra]', 'numpy', 'pandas']
       )
