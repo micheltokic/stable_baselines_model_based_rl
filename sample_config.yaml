@@ -1,7 +1,8 @@
-input_dimension: 5
-output_dimension: 5
+input_cols: ["x_1", "x_2", "x_3", "x_4"]
+output_cols: ["a_1", "a_2"]
 reinforcement_learning_algorithm: 'PPO'
 model_type: 'MLP'
+gym_environment_name: 'Cart_Pole_v1'
 input_file_name: 'train.csv'
 train_test_ration: 0.2
-lags: 'keine_ahnung'
+lags: '3'
