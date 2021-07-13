@@ -5,7 +5,7 @@ from gym.spaces.discrete import Discrete
 import pandas as pd
 
 
-def get_dimension(space: space):
+def __get_dimension(space: space):
     """
     Returns the dimension of a given gym (action/ observation)
     space.
@@ -32,7 +32,7 @@ def sample_input_and_config(gym_environment_name, episode_count=20, max_steps=10
     d = {}
     input_col_names = []
 
-    for i in range(0, get_dimension(observation_space)):
+    for i in range(0, __get_dimension(observation_space)):
         input_name = "X_" + str(i)
         d[input_name] = []
         input_col_names.append(input_name)
