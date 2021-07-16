@@ -1,5 +1,15 @@
-input_cols: ["x_1", "x_2", "x_3", "x_4"]
-output_cols: ["a_1", "a_2"]
+# CSV/Data Configuration
+action_cols:
+    - A_0
+    - A_1
+action_type: DISCRETE  # one of: DISCRETE, MULTI_DISCRETE, BOX
+discrete_colum_sets: null
+observation_cols:
+    - X_0
+    - X_1
+    - X_2
+    - X_3
+
 reinforcement_learning_algorithm: 'PPO'
 model_type: 'MLP'
 gym_environment_name: 'Cart_Pole_v1'
