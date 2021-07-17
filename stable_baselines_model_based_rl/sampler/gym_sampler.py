@@ -58,7 +58,9 @@ def __map_sampled_action_to_columns(action_space: space, action_config, sample_a
 
 def __generate_config_yaml_file(action_cols, observation_cols, action_config,
                                 output='./sampled_config_gym.yaml', data_file=None):
-    sample_config_file = open('./sample_config.yaml')
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../sample_config.yaml')
+
+    sample_config_file = open(path)
     config = yaml.full_load(sample_config_file)
     
     config['action_cols'] = action_cols
@@ -133,7 +135,7 @@ def sample_gym_environment(gym_environment_name: str, episode_count=20, max_step
                 'EPISODE': int(episode),
                 'STEP': int(step),
                 **__map_sampled_action_to_columns(env.action_space, action_config, action),
-                **{ observation_col_names[i]: obs[i] for i in range(0, len(observation_col_names)) },
+                **{observation_col_names[i]: obs[i] for i in range(0, len(observation_col_names))},
             }, ignore_index=True)
             
             obs, reward, done, _ = env.step(action)
@@ -142,10 +144,13 @@ def sample_gym_environment(gym_environment_name: str, episode_count=20, max_step
     
     df = df.astype({'EPISODE': int, 'STEP': int})
     time = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
-    data_file = f'./sample_output/{gym_environment_name.lower()}_{time}_sampled_data.csv'
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../sample_output')
+
+    #./ sample_output /
+    data_file = f'{path}/{gym_environment_name.lower()}_{time}_sampled_data.csv'
     df.to_csv(data_file, sep=',', encoding='utf-8', index=False)
 
-    config_file = f'./sample_output/{gym_environment_name.lower()}_{time}_config.yaml'
+    config_file = f'{path}/{gym_environment_name.lower()}_{time}_config.yaml'
     __generate_config_yaml_file(action_col_names, observation_col_names, action_config,
                                 output=config_file, data_file=data_file)
 
