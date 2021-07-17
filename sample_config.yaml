@@ -9,10 +9,17 @@ observation_cols:
     - X_1
     - X_2
     - X_3
-
-reinforcement_learning_algorithm: 'PPO'
-model_type: 'MLP'
 gym_environment_name: 'Cart_Pole_v1'
 input_file_name: 'train.csv'
-train_test_ration: 0.2
+
+# Dynamic Model Configuration
+model_type: 'MLP'
+train_test_ration: 0.7
 lags: '3'
+max_epochs: 1000
+steps_per_epoch: 100
+validation_steps: 100
+validation_freq: 1
+
+# Capsulating Configuration
+reinforcement_learning_algorithm: 'PPO'
