@@ -86,6 +86,7 @@ def __plot_results(input_col_names, dfNet, dfEval, window_size):
         axs[i].grid()
         axs[i].legend(loc="best")
 
+    fig.savefig('plot.png')
     # axs[4].plot(range(len(dfNet)), dfEval['ACTION'].values[window_size:], label='ACTION')
     # axs[4].grid()
     # axs[4].legend(loc="best")
