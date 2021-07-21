@@ -27,8 +27,8 @@ def sample_environment_and_train_dynamic_model(gym_environment_name, episode_cou
         lstm_model: The lstm model trained on the given dataset
     """
     data_file_name, config_file_name = sampler.sample_gym_environment(gym_environment_name, episode_count, max_steps)
-    return build_and_train_dynamic_model(data_file_name, config_file_name, log=True, evaluate_model=True,
-                                         plot_results=True, export_model=True)
+    return build_and_train_dynamic_model(data_file_name, config_file_name, log=log, evaluate_model=evaluate_model,
+                                         plot_results=plot_results, export_model=export_model)
 
 
 def build_and_train_dynamic_model(data_file_name, config_file_name, log=True, evaluate_model=True, plot_results=True,
@@ -67,7 +67,7 @@ def build_and_train_dynamic_model(data_file_name, config_file_name, log=True, ev
     print("Observation Columns: ", target_col_names)
 
     # 4 steps into the past... Why ? window_size == lag ?
-    window_size = 4
+    window_size = int(config_dict["lags"])
 
     train_data, val_data, input_shape, mean_in, std_in, mean_out, std_out = \
         tensorflow_data_generator.prepare_data(data_frame, input_col_names, target_col_names,
@@ -99,6 +99,6 @@ def build_and_train_dynamic_model(data_file_name, config_file_name, log=True, ev
         lstm_model.save(model_path)
 
     if evaluate_model:
-        verifier.evaluate_model(data_frame, input_col_names, target_col_names, window_size, plot=plot_results)
+        verifier.evaluate_model(data_frame, input_col_names, config_dict['action_cols'], target_col_names, window_size, plot=plot_results)
 
     return lstm_model
