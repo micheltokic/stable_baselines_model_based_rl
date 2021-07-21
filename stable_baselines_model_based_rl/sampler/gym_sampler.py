@@ -63,11 +63,11 @@ def __generate_config_yaml_file(action_cols, observation_cols, action_config,
     sample_config_file = open(path)
     config = yaml.full_load(sample_config_file)
     
-    config['action_cols'] = action_cols
-    config['observation_cols'] = observation_cols
-    config['action_type'] = action_config['type']
+    config['input_config']['action_cols'] = action_cols
+    config['input_config']['observation_cols'] = observation_cols
+    config['input_config']['action_type'] = action_config['type']
     if data_file is not None:
-        config['input_file_name'] = os.path.abspath(data_file)
+        config['input_config']['input_file_name'] = os.path.abspath(data_file)
     
     output_file = open(output, mode='w')
     yaml.dump(config, output_file)

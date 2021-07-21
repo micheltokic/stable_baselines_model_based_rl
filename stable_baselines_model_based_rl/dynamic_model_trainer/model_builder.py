@@ -1,25 +1,24 @@
 import tensorflow as tf
 import numpy as np
+import yaml
 
 
-def build_lstm(input_shape, mean_out, optimizer=tf.keras.optimizers.RMSprop(), lstm_len=50, loss="mse"):
+def build_dynamic_model(model_config, optimizer, loss):
     """
     Creates and compiles a neural network consisting of a 'Long Short Term Memory' layer followed by a 'Dense' layer.
 
     Args:
         input_shape: Shape of the input
-        mean_out: Mean of the targets to determine dense layer length
-        optimizer: Optimizer used by neural network for gradients calculations
-        lstm_len: Length of the 'Long Short Term Memory' layer
-        loss: Name of the loss function used for the error calculation by the neural network
+        model_config: dictionary containing the model building configuration
+        optimizer: Optimizer used optimizing gradient descent
+        loss: loss function used calculating the error
 
     Returns:
-        lstm_model: Compiled tensorflow model with one 'Long Short Term Memory' layer and one consecutive 'Dense' layer
+        dynamic_model: Compiled tensorflow model with architecture given in the model_config dictionary
     """
 
-    lstm_model = tf.keras.models.Sequential()
-    lstm_model.add(tf.keras.layers.LSTM(lstm_len, input_shape=input_shape, dtype=np.float64))
-    lstm_model.add(tf.keras.layers.Dense(len(mean_out)))
-    lstm_model.compile(optimizer=optimizer, loss=loss)
+    yaml_model_config = yaml.dump(model_config)
+    dynamic_model = tf.keras.models.model_from_yaml(yaml_model_config, custom_objects=None)
+    dynamic_model.compile(optimizer=optimizer, loss=loss)
 
-    return lstm_model
+    return dynamic_model
