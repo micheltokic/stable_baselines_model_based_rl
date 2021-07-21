@@ -97,5 +97,7 @@ def __plot_results(input_col_names, action_col_names, dfNet, dfEval, window_size
 
         axs[i].grid()
         axs[i].legend(loc="best")
-
+        
+        
+    fig.savefig('plot.png')
     plt.show()
