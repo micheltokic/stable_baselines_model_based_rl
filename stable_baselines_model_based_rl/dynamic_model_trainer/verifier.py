@@ -69,27 +69,34 @@ def evaluate_model(data_frame, input_col_names, action_col_names, target_col_nam
 
             # update RNN state
             dfEval_actions = np.float64([dfEval[action_col_name].values[i] for action_col_name in action_col_names])
-            stateBuffer = [netOutput[0], netOutput[1], netOutput[2], netOutput[3]]
-            stateBuffer.append(np.append(dfEval_actions, netOutput))
+            stateBuffer.append(np.concatenate((dfEval_actions, netOutput)))
 
     if plot:
         __plot_results(input_col_names, action_col_names, dfNet, dfEval, window_size)
 
 
 def __plot_results(input_col_names, action_col_names, dfNet, dfEval, window_size):
-    fig, axs = plt.subplots(len(input_col_names), 1, figsize=(10, 10))
+    fig, axs = plt.subplots(len(input_col_names)+1, 1, figsize=(10, 15))
 
     # TODO
-    for i in range(0, len(input_col_names)):
-        f = input_col_names[i]
-        axs[i].plot(range(len(dfNet)), dfEval[f].values[window_size:], label=f)
+    for i in range(len(input_col_names)):
+        col_name = input_col_names[i]
+        axs[i].plot(range(len(dfNet)), dfEval[col_name].values[window_size:], label=col_name)
 
-        if f not in action_col_names:
-            axs[i].plot(range(len(dfNet)), dfNet[f].values, label="prediction", ls="--")
+        if col_name not in action_col_names:
+            axs[i].plot(range(len(dfNet)), dfNet[col_name].values, label="prediction", ls="--")
 
         axs[i].grid()
         axs[i].legend(loc="best")
         
-        
+    # plot std & mean
+    std_values = np.zeros(len(input_col_names))
+    mean_values = np.zeros(len(input_col_names))
+    for index, col in enumerate(input_col_names):
+        # calculate for every column the std and mean value
+        std_values[index] = np.std(dfEval[col])
+        mean_values[index] = np.mean(dfEval[col])
+    axs[len(input_col_names)].errorbar(range(len(input_col_names)), mean_values, std_values, linestyle='None', marker='^')
+
     fig.savefig('plot.png')
     plt.show()
