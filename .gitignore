@@ -1,5 +1,11 @@
 .vscode
 *.csv
 
+__pycache__
+*.egg-info
+
 Pipfile
 Pipfile.lock
+
+model_logs_tb/
+model_output/
