@@ -24,7 +24,7 @@ def __get_dimension(space: space):
 
 def __get_action_columns_and_sets(action_space: space):
     action_columns = []
-    action_config = []
+    action_config = {}
     
     if isinstance(action_space, Discrete):
         action_columns = [f'A_{i}' for i in range(action_space.n)]
@@ -37,7 +37,18 @@ def __get_action_columns_and_sets(action_space: space):
         pass  # todo
     
     elif isinstance(action_space, Box):
-        pass  # todo
+        action_columns = []
+        bounds = {}
+        for i in range(action_space.shape[0]):
+            col_name = f'A_{i}'
+            action_columns.append(col_name)
+            bounds[col_name] = [float(action_space.low[i]), float(action_space.high[i])]
+        action_config = {
+            'type': 'BOX',
+            'col_names': action_columns,
+            'dimensions': action_space.shape[0],
+            'box_bounds': bounds
+        }
     
     return action_columns, action_config
 
@@ -53,7 +64,10 @@ def __map_sampled_action_to_columns(action_space: space, action_config, sample_a
         pass  # todo
 
     elif isinstance(action_space, Box):
-        pass  # todo
+        assert action_config['type'] == 'BOX'
+        cols = action_config['col_names']
+        values = list(sample_action)
+        return dict(zip(cols, values))
 
 
 def __generate_config_yaml_file(action_cols, observation_cols, action_config,
@@ -68,6 +82,9 @@ def __generate_config_yaml_file(action_cols, observation_cols, action_config,
     config['input_config']['action_type'] = action_config['type']
     if data_file is not None:
         config['input_config']['input_file_name'] = os.path.abspath(data_file)
+
+    if action_config['type'] == 'BOX':
+        config['input_config']['box_bounds'] = dict(action_config['box_bounds'])
     
     output_file = open(output, mode='w')
     yaml.dump(config, output_file)
@@ -155,3 +172,5 @@ def sample_gym_environment(gym_environment_name: str, episode_count=20, max_step
                                 output=config_file, data_file=data_file)
 
     return data_file, config_file
+
+sample_gym_environment('MountainCarContinuous-v0')
