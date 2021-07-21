@@ -62,23 +62,15 @@ def evaluate_model(data_frame, input_col_names, action_col_names, target_col_nam
             if i == window_size:
                 print(state)
             netOutput = model.predict(np.float64(state))[0]
-            # print ("Prediction %d: %s" % (i, netOutput))
 
             # append plotting data
             dfNet = dfNet.append({target_col_names[j]: netOutput[j] for j in range(0, len(target_col_names))}
                                  , ignore_index=True)
 
-            action = 'A_0'
             # update RNN state
-            stateBuffer.append([dfEval[input_col_names[j]].values[i] for j in range(0, len(input_col_names))])
-
-            # stateBuffer.append(np.float64([netOutput[0], netOutput[1],
-            #                               netOutput[2], netOutput[3],
-            #                               dfEval[action].values[i]]))
-
-            state_buffer_list = [netOutput[0], netOutput[1], netOutput[2], netOutput[3]]
-            for action_name in action_col_names:
-                state_buffer_list.append(dfEval[action_name].values[i])
+            dfEval_actions = np.float64([dfEval[action_col_name].values[i] for action_col_name in action_col_names])
+            stateBuffer = [netOutput[0], netOutput[1], netOutput[2], netOutput[3]]
+            stateBuffer.append(np.append(dfEval_actions, netOutput))
 
     if plot:
         __plot_results(input_col_names, action_col_names, dfNet, dfEval, window_size)
