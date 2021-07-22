@@ -172,5 +172,3 @@ def sample_gym_environment(gym_environment_name: str, episode_count=20, max_step
                                 output=config_file, data_file=data_file)
 
     return data_file, config_file
-
-sample_gym_environment('MountainCarContinuous-v0')
