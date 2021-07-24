@@ -9,3 +9,9 @@ Pipfile.lock
 
 model_logs_tb/
 model_output/
+
+__pycache__
+
+venv
+
+*.egg-info
