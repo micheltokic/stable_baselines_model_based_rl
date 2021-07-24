@@ -98,5 +98,5 @@ def __plot_results(input_col_names, action_col_names, dfNet, dfEval, window_size
         mean_values[index] = np.mean(dfEval[col])
     axs[len(input_col_names)].errorbar(range(len(input_col_names)), mean_values, std_values, linestyle='None', marker='^')
 
-    fig.savefig('plot.png')
+    fig.savefig('plots/plot.png')
     plt.show()

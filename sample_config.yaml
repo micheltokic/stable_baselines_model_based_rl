@@ -19,7 +19,7 @@ input_config:
 dynamic_model:
     training:
         train_test_ration: 0.7  # 0.7: 70% of the data is used for training, 30% for testing
-        lag: 4
+        lag: 1
         validation_steps: 100
         validation_freq: 1
         max_epochs: 100
