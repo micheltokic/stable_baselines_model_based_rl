@@ -1,3 +1,4 @@
+from stable_baselines_model_based_rl.utils.test_functions import add_fake_noise
 import tensorflow as tf
 import numpy as np
 
@@ -27,7 +28,9 @@ def prepare_data(df, input_col, target_col, window_size, training_batch_size=10,
         mean_out: Mean of the targets
         std_out: Standard deviation of the targets
     """
-
+    # uncomment to artificially add noise to the data
+    # df = add_fake_noise(df, target_col, 0.5)
+    
     ((x_train_multi, y_train_multi), (x_val_multi, y_val_multi)), mean_in, std_in, mean_out, std_out = \
         __create_training_data(df, input_col, target_col, window_size=window_size,
                                training_pattern_percent=training_pattern_percent)

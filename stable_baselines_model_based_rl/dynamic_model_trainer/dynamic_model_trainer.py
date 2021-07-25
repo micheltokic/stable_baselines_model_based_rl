@@ -62,8 +62,7 @@ def build_and_train_dynamic_model(data_file_name, config_file_name):
 
     target_col_names = config_dict['input_config']['observation_cols']
     action_col_names = config_dict['input_config']['action_cols']
-    observation_col_names = config_dict['input_config']['observation_cols']
-    input_col_names = action_col_names + observation_col_names
+    input_col_names = action_col_names + target_col_names
 
     print("Input Columns: ", input_col_names)
     print("Observation Columns: ", target_col_names)
@@ -108,7 +107,7 @@ def build_and_train_dynamic_model(data_file_name, config_file_name):
         lstm_model.save(model_path)
 
     if config_dict['dynamic_model']['utility_flags']['evaluate_model']:
-        verifier.evaluate_model(data_frame, input_col_names, action_col_names, target_col_names, lag,
-                                plot=config_dict['dynamic_model']['utility_flags']['plot_results'])
+        verifier.evaluate_model(data_frame, input_col_names, action_col_names, target_col_names, lag, mean_in, 
+            std_in, plot=config_dict['dynamic_model']['utility_flags']['plot_results'])
 
     return lstm_model

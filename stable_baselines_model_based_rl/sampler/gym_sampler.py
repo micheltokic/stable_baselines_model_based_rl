@@ -115,6 +115,7 @@ def sample_gym_environment(gym_environment_name: str, episode_count=20, max_step
     env = gym.make(gym_environment_name)
     # for details see: https://github.com/openai/gym/blob/master/gym/envs/classic_control/cartpole.py
     env.np_random.seed(0)
+    env.action_space.np_random.seed(0)
 
     action_col_names, action_config = __get_action_columns_and_sets(env.action_space)
     observation_space = env.observation_space

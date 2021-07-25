@@ -23,7 +23,7 @@ dynamic_model:
         lag: 1
         validation_steps: 100
         validation_freq: 1
-        max_epochs: 10 #100
+        max_epochs: 100
         steps_per_epoch: 100
         learning_rate: 0.1
         loss: mse   # Mean squared error
