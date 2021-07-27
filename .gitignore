@@ -7,8 +7,10 @@ __pycache__
 Pipfile
 Pipfile.lock
 
-model_logs_tb/
-model_output/
+model_logs_tb/*
+model_output/*
+plots/*
+sample_output/*
 
 __pycache__
 
