@@ -71,11 +71,14 @@ def __map_sampled_action_to_columns(action_space: space, action_config, sample_a
 
 
 def __generate_config_yaml_file(action_cols, observation_cols, action_config,
-                                output='./sampled_config_gym.yaml', data_file=None):
+                                output='./sampled_config_gym.yaml', data_file=None,
+                                env_name='unknown'):
     path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../sample_config.yaml')
 
     sample_config_file = open(path)
     config = yaml.full_load(sample_config_file)
+
+    config['gym_sampling']['gym_environment_name'] = env_name
     
     config['input_config']['action_cols'] = action_cols
     config['input_config']['observation_cols'] = observation_cols
@@ -170,6 +173,7 @@ def sample_gym_environment(gym_environment_name: str, episode_count=20, max_step
 
     config_file = f'{path}/{gym_environment_name.lower()}_{time}_config.yaml'
     __generate_config_yaml_file(action_col_names, observation_col_names, action_config,
-                                output=config_file, data_file=data_file)
+                                output=config_file, data_file=data_file,
+                                env_name=gym_environment_name)
 
     return data_file, config_file

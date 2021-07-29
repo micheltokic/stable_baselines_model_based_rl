@@ -1,5 +1,12 @@
-###############SAMPLING###############
-# CSV/Data Configuration
+#
+# Gym Sampling
+#
+gym_sampling:
+    gym_environment_name: 'CartPole-v1'
+
+#
+# Input Data Configuration
+#
 input_config:
     action_cols:
         - A_0
@@ -12,11 +19,11 @@ input_config:
         - X_1
         - X_2
         - X_3
-    gym_environment_name: 'Cart_Pole_v1'
     input_file_name: 'train.csv'
-####################################################
 
-###############DYNAMIC MODEL###############
+#
+# Dynamic Model
+#
 dynamic_model:
     training:
         train_test_ration: 0.7  # 0.7: 70% of the data is used for training, 30% for testing
@@ -49,9 +56,9 @@ dynamic_model:
         evaluate_model: True
         plot_results: True
         export_model: True
-####################################################
 
-###############CAPSULING###############
-capsuling:
+#
+# Policy Configuration
+#
+policy:
     reinforcement_learning_algorithm: 'PPO'
-####################################################
