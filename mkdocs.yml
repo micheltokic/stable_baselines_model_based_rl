@@ -1,0 +1,17 @@
+site_name: Stable Baselines - Model Based Reinforcement Learning
+theme:
+  name: material
+  features:
+    - navigation.expand
+plugins:
+  - search
+  - awesome-pages
+nav:
+  - index.md
+  - 'Using the Framework':
+    - sampling.md
+    - dynamic-model-training.md
+    - environment-wrapping.md
+    - policy-training.md
+  - configuration-file.md
+  - ...
