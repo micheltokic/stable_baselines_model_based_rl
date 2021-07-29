@@ -1,7 +1,7 @@
 import os
-import dynamic_model_trainer
 import numpy as np
 import matplotlib.pyplot as plt
+from stable_baselines_model_based_rl.dynamic_model_trainer import dynamic_model_trainer
 
 
 sample = True

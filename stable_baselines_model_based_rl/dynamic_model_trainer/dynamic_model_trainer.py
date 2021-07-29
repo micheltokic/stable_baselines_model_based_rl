@@ -1,11 +1,9 @@
 import stable_baselines_model_based_rl.sampler.gym_sampler as sampler
-import tensorflow_data_generator
 import tensorflow as tf
-import model_builder
 import pandas as pd
 import os
 import yaml
-import verifier
+from . import model_builder, tensorflow_data_generator, verifier
 
 
 def sample_environment_and_train_dynamic_model(gym_environment_name, episode_count, max_steps):
