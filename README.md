@@ -25,7 +25,11 @@ To serve the docs with hot reloading run: `mkdocs serve`
 The **lazydocs** package is used for automatic generation of API docs. To
 generate latest version of the API docs run:
 ```
-lazydocs --overview-file=README.md --output-path ./docs/api ./stable_baselines_model_based_rl
+lazydocs \
+    --overview-file="README.md" \
+    --output-path="./docs/api" \
+    --src-base-url="https://github.com/micheltokic/stable_baselines_model_based_rl/blob/main/" \
+    ./stable_baselines_model_based_rl
 ```
 This will generate the api docs for the entire stable_baslines_model_based_rl
 module and also create an overview page containing links to all packages, modules,
