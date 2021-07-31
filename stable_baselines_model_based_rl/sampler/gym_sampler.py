@@ -1,12 +1,13 @@
 import datetime
 import os
+
 import gym
+import pandas as pd
 from gym.spaces import space
 from gym.spaces.box import Box
 from gym.spaces.discrete import Discrete
 from gym.spaces.multi_discrete import MultiDiscrete
-import pandas as pd
-import yaml
+from utils.configuration import Configuration
 
 
 def __get_dimension(space: space):
@@ -74,27 +75,21 @@ def __generate_config_yaml_file(action_cols, observation_cols, action_config,
                                 output='./sampled_config_gym.yaml', data_file=None,
                                 env_name='unknown'):
     path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../sample_config.yaml')
+    config = Configuration(path)
 
-    sample_config_file = open(path)
-    config = yaml.full_load(sample_config_file)
-
-    config['gym_sampling']['gym_environment_name'] = env_name
+    config.set('gym_sampling.gym_environment_name', env_name)
     
-    config['input_config']['action_cols'] = action_cols
-    config['input_config']['observation_cols'] = observation_cols
-    config['input_config']['action_type'] = action_config['type']
+    config.set('input_config.action_cols', action_cols)
+    config.set('input_config.observation_cols', observation_cols)
+    config.set('input_config.action_type', action_config['type'])
     if data_file is not None:
-        config['input_config']['input_file_name'] = os.path.abspath(data_file)
+        config.set('input_config.input_file_name', os.path.abspath(data_file))
 
     if action_config['type'] == 'BOX':
-        config['input_config']['box_bounds'] = dict(action_config['box_bounds'])
+        config.set('input_config.box_bounds', dict(action_config['box_bounds']))
     
-    output_file = open(output, mode='w')
-    yaml.dump(config, output_file)
-    sample_config_file.close()
-    output_file.close()
-    
-    return output_file
+    config.save_config(file=output)
+    return output
 
 
 def sample_gym_environment(gym_environment_name: str, episode_count=20, max_steps=100):
