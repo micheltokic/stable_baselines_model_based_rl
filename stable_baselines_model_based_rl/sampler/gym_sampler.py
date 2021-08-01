@@ -73,7 +73,7 @@ def __map_sampled_action_to_columns(action_space: space, action_config, sample_a
 
 def __generate_config_yaml_file(action_cols, observation_cols, action_config,
                                 output='./sampled_config_gym.yaml', data_file=None,
-                                env_name='unknown'):
+                                env_name='unknown') -> Configuration:
     path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../sample_config.yaml')
     config = Configuration(path)
 
@@ -89,7 +89,7 @@ def __generate_config_yaml_file(action_cols, observation_cols, action_config,
         config.set('input_config.box_bounds', dict(action_config['box_bounds']))
     
     config.save_config(file=output)
-    return output
+    return config
 
 
 def sample_gym_environment(gym_environment_name: str, episode_count=20, max_steps=100):
@@ -107,7 +107,7 @@ def sample_gym_environment(gym_environment_name: str, episode_count=20, max_step
         epsiode_count: Amount of episodes to use for the sampling.
         max_steps: Maximum steps per episode allowed during sampling.
 
-    Returns (path_to_csv_data_file, path_to_yaml_config_file)
+    Returns (path_to_csv_data_file, configuration object)
     """
 
     env = gym.make(gym_environment_name)
@@ -167,8 +167,8 @@ def sample_gym_environment(gym_environment_name: str, episode_count=20, max_step
     df.to_csv(data_file, sep=',', encoding='utf-8', index=False)
 
     config_file = f'{path}/{gym_environment_name.lower()}_{time}_config.yaml'
-    __generate_config_yaml_file(action_col_names, observation_col_names, action_config,
-                                output=config_file, data_file=data_file,
-                                env_name=gym_environment_name)
+    config = __generate_config_yaml_file(action_col_names, observation_col_names, action_config,
+                                         output=config_file, data_file=data_file,
+                                         env_name=gym_environment_name)
 
-    return data_file, config_file
+    return data_file, config

@@ -1,8 +1,12 @@
-import stable_baselines_model_based_rl.sampler.gym_sampler as sampler
-import tensorflow as tf
-import pandas as pd
 import os
-import yaml
+from copy import deepcopy
+
+import pandas as pd
+import tensorflow as tf
+from utils.configuration import Configuration
+
+import stable_baselines_model_based_rl.sampler.gym_sampler as sampler
+
 from . import model_builder, tensorflow_data_generator, verifier
 
 
@@ -24,11 +28,11 @@ def sample_environment_and_train_dynamic_model(gym_environment_name, episode_cou
         lstm_model: The lstm model trained on the given dataset
     """
 
-    data_file_name, config_file_name = sampler.sample_gym_environment(gym_environment_name, episode_count, max_steps)
-    return build_and_train_dynamic_model(data_file_name, config_file_name)
+    data_file_name, config = sampler.sample_gym_environment(gym_environment_name, episode_count, max_steps)
+    return build_and_train_dynamic_model(data_file_name, config)
 
 
-def build_and_train_dynamic_model(data_file_name, config_file_name):
+def build_and_train_dynamic_model(data_file_name, config: Configuration):
     """
     Builds and trains a dynamic model for a given csv dataset retrieved from a gym environment based on configurations
     specified in a yaml file
@@ -49,12 +53,7 @@ def build_and_train_dynamic_model(data_file_name, config_file_name):
     """
     data_frame = pd.read_csv(data_file_name)
 
-    try:
-        with open(config_file_name) as file:
-            config_dict = yaml.load(file, Loader=yaml.FullLoader)
-    except:
-        print("Configuration file could not be loaded")
-        return
+    config_dict = deepcopy(config.config)
 
     print("Configuration dictionary: ", config_dict)
 
