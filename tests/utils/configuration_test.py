@@ -27,6 +27,7 @@ def test_configuration_set_and_get(mocker):
     expected_config['key'] = 12
     expected_config['key2'] = {'foo': 'bar'}
     expected_config['key3'] = (1, 2, 3, 'string')
+    assert config.config == expected_config
 
 
 
