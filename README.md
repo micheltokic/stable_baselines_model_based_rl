@@ -12,6 +12,13 @@ dependencies, as well as installing the package in editable mode (develop mode).
 Running `pip install -e .` will not install develop dependencies, as they are
 stored in the requirements.txt file only.
 
+### Tests
+Unit tests are located in the `./tests` directory. They can be executed using
+the following command:
+```
+python -m pytest ./tests
+```
+
 ## Documentation
 MkDocs is used for generating the (user) documentation. The source markdown files
 are stored in the `./docs` directory. All required dependencies for building the
