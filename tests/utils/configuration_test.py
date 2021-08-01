@@ -1,7 +1,7 @@
 from stable_baselines_model_based_rl.utils.configuration import Configuration
 
 
-def test_configuration_set_and_get(mocker):
+def test_configuration_set(mocker):
     mocker.patch(
         'stable_baselines_model_based_rl.utils.configuration.Configuration.load_config_from_file')
     config = Configuration('foo')
@@ -29,6 +29,39 @@ def test_configuration_set_and_get(mocker):
     expected_config['key3'] = (1, 2, 3, 'string')
     assert config.config == expected_config
 
+
+def test_configuration_get(mocker):
+    mocker.patch(
+        'stable_baselines_model_based_rl.utils.configuration.Configuration.load_config_from_file')
+    config = Configuration('foo')
+    config.config = {
+        'key1': 1,
+        'key2': (1, 2, 'three'),
+        'key3': 'string',
+        'nested': {
+            'key': {
+                'list': [1, 2, 3],
+                'float': 0.1234,
+            }
+        }
+    }
+
+    assert config.get('key1') == 1
+    assert config.get('key2') == (1, 2, 'three')
+    assert config.get('key2.foo') == None
+    assert config.get('key3') == 'string'
+    assert config.get('nested') == {
+            'key': {
+                'list': [1, 2, 3],
+                'float': 0.1234,
+            }
+        }
+    assert config.get('nested.key') == {
+            'list': [1, 2, 3],
+            'float': 0.1234,
+        }
+    assert config.get('nested.key.list') == [1, 2, 3]
+    assert config.get('nested.key.float') == 0.1234
 
 
 def test_configuration_get_default(mocker):
