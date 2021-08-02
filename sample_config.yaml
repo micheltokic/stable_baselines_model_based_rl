@@ -50,12 +50,17 @@ dynamic_model:
               config:
                 units: 4
                 activation: relu
+            noise:
+                mean: 0
+                std: 0.1
+                percentage: 0.5
 
     utility_flags:
         log_training: True
         evaluate_model: True
         plot_results: True
         export_model: True
+        artificial_noise: True
 
 #
 # Policy Configuration

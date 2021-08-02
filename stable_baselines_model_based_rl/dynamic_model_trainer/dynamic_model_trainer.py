@@ -78,9 +78,16 @@ def build_and_train_dynamic_model(data_file_name, config: Configuration):
     learning_rate = config_dict['dynamic_model']['training']['learning_rate']
     patience = config_dict['dynamic_model']['training']['patience']
 
+    artificial_noise = config_dict['dynamic_model']['utility_flags']['artificial_noise']
+    noise_settings = []
+    if artificial_noise:
+        mean = config_dict['dynamic_model']['model']['config']['noise']['mean']
+        std = config_dict['dynamic_model']['model']['config']['noise']['std']
+        percentage = config_dict['dynamic_model']['model']['config']['noise']['percentage']
+        noise_settings = [mean, std, percentage]
     train_data, val_data, input_shape, mean_in, std_in, mean_out, std_out = \
         tensorflow_data_generator.prepare_data(data_frame, input_col_names, target_col_names,
-                                               window_size=lag, training_pattern_percent=train_test_ration)
+                                               window_size=lag, training_pattern_percent=train_test_ration, noise_settings=noise_settings)
 
     callbacks = [tf.keras.callbacks.EarlyStopping(monitor="loss", patience=patience, restore_best_weights=True,
                                                   verbose=True)]

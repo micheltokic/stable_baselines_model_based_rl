@@ -1,4 +1,5 @@
 import random
+import numpy as np
 
 def add_fake_noise(data, observation_columns, noise):
     """
@@ -26,3 +27,11 @@ def add_fake_noise(data, observation_columns, noise):
                 noisy_data[obs_col][index] -= noise
     
     return noisy_data
+
+def add_gaussian_noise(data, observation_columns, mean=0, std=0, percentage=0.5):
+    obs_data = data[observation_columns]
+    noise = np.random.normal(mean, std, obs_data.shape)
+    noise_indices = np.random.randint(0, len(obs_data), int(len(obs_data)*percentage))
+    obs_data.loc[noise_indices] += noise[noise_indices]
+    data[observation_columns] = obs_data
+    return data
