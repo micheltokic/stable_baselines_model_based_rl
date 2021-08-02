@@ -3,11 +3,11 @@ from setuptools import find_packages, setup
 setup(
     name='stable_baselines_model_based_rl',
     version='0.0.1',
-    packages=find_packages(
-        where='stable_baselines_model_based_rl',
-    ),
-    package_dir={'': 'stable_baselines_model_based_rl'},
-    requires=['setuptools'],
+    # packages=find_packages(
+    #     where='stable_baselines_model_based_rl',
+    # ),
+    # package_dir={'': 'stable_baselines_model_based_rl'},
+    # requires=['setuptools'],
     install_requires=[
         'gym==0.18.3',
         'numpy==1.19.3',

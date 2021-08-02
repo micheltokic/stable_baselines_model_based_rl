@@ -3,7 +3,7 @@ from copy import deepcopy
 
 import pandas as pd
 import tensorflow as tf
-from utils.configuration import Configuration
+from stable_baselines_model_based_rl.utils.configuration import Configuration
 
 import stable_baselines_model_based_rl.sampler.gym_sampler as sampler
 

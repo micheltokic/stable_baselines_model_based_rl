@@ -7,7 +7,7 @@ from gym.spaces import space
 from gym.spaces.box import Box
 from gym.spaces.discrete import Discrete
 from gym.spaces.multi_discrete import MultiDiscrete
-from utils.configuration import Configuration
+from stable_baselines_model_based_rl.utils.configuration import Configuration
 
 
 def __get_dimension(space: space):
