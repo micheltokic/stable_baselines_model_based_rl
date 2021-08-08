@@ -51,6 +51,7 @@ dynamic_model:
                 units: 4
                 activation: relu
             noise:
+                calc_mean: true
                 mean: 0
                 std: 0.1
                 percentage: 0.5

@@ -2,7 +2,7 @@ import os
 
 from utils.configuration import Configuration
 
-from stable_baselines_model_based_rl.dynamic_model_trainer import dynamic_model_trainer
+from dynamic_model_trainer import dynamic_model_trainer
 
 
 sample = True
