@@ -5,8 +5,8 @@ import keras
 import pandas as pd
 
 from definitions import ROOT_DIR
-from dynamic_model_trainer import tensorflow_data_generator, model_builder, verifier
-from utils.configuration import Configuration
+from stable_baselines_model_based_rl.dynamic_model_trainer import tensorflow_data_generator, model_builder, verifier
+from stable_baselines_model_based_rl.utils.configuration import Configuration
 
 import stable_baselines_model_based_rl.sampler.gym_sampler as sampler
 

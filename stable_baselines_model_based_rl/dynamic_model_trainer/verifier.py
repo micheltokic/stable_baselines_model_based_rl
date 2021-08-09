@@ -7,8 +7,6 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 from shutil import copyfile, copy2
 
-from utils.configuration import Configuration
-
 
 def evaluate_model(data_frame, input_col_names, action_col_names, target_col_names, lag):
     """

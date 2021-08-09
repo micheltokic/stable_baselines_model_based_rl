@@ -1,5 +1,5 @@
 import os
-from utils.configuration import Configuration
+from stable_baselines_model_based_rl.utils.configuration import Configuration
 from stable_baselines_model_based_rl.dynamic_model_trainer import training
 from definitions import ROOT_DIR
 
