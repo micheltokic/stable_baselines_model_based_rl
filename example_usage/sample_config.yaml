@@ -27,36 +27,38 @@ input_config:
 dynamic_model:
     training:
         train_test_ration: 0.7  # 0.7: 70% of the data is used for training, 30% for testing
-        lag: 1
+        lag: 4
         validation_steps: 100
         validation_freq: 1
-        max_epochs: 100
-        steps_per_epoch: 100
-        learning_rate: 0.1
+        max_epochs: 50
+        steps_per_epoch: 1000
+        learning_rate: 0.05
         loss: mse   # Mean squared error
         optimizer: adam
-        batch_size: 32
+        batch_size: 64
         patience: 15    # Epochs in which no learning success is achieved, after which the training is discontinued
-    model:  # Parameters of the model key must be left in this form for the tensorflow deserializer to work
-        backend: tensorflow
+    keras_model:  # Parameters of the model key must be left in this form for the tensorflow deserializer to work
         class_name: Sequential
         config:
             name: 'my_net'
             layers:
             - class_name: LSTM
               config:
-                units: 4
+                units: 128
             - class_name: Dense
               config:
                 units: 4
                 activation: relu
-            noise:
-                mean: 0
-                std: 0.1
-                percentage: 0.5
+
+    validation:
+        noise:
+            mean: 0
+            std: 0.1
+            percentage: 0.5
 
     utility_flags:
         log_training: True
+        save: True
         evaluate_model: True
         plot_results: True
         export_model: True

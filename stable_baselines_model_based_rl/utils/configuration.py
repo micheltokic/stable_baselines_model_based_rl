@@ -45,7 +45,8 @@ class Configuration:
         keys = key.split('.')
         keys.reverse()
         item = self.config
-        while len(keys) > 0:
+        len_keys = len(keys)
+        while len_keys > 0:
             next_key = keys.pop()
             if next_key not in item:
                 return default

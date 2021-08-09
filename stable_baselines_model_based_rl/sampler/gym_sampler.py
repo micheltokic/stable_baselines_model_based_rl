@@ -7,6 +7,8 @@ from gym.spaces import space
 from gym.spaces.box import Box
 from gym.spaces.discrete import Discrete
 from gym.spaces.multi_discrete import MultiDiscrete
+
+from definitions import ROOT_DIR
 from utils.configuration import Configuration
 
 
@@ -74,7 +76,8 @@ def __map_sampled_action_to_columns(action_space: space, action_config, sample_a
 def __generate_config_yaml_file(action_cols, observation_cols, action_config,
                                 output='./sampled_config_gym.yaml', data_file=None,
                                 env_name='unknown') -> Configuration:
-    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../sample_config.yaml')
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                        '../../example_usage/sample_config.yaml')
     config = Configuration(path)
 
     config.set('gym_sampling.gym_environment_name', env_name)
@@ -92,7 +95,7 @@ def __generate_config_yaml_file(action_cols, observation_cols, action_config,
     return config
 
 
-def sample_gym_environment(gym_environment_name: str, episode_count=20, max_steps=100):
+def sample_gym_environment(gym_environment_name: str, episode_count=20, max_steps=100, output_path=os.path.join(ROOT_DIR, 'sample_output')):
     """
     Sample the given gym environment with the given amount of episodes and maximum
     steps per episode.
@@ -106,6 +109,7 @@ def sample_gym_environment(gym_environment_name: str, episode_count=20, max_step
         gym_environment_name: Name of the Gym-Environment to sample.
         epsiode_count: Amount of episodes to use for the sampling.
         max_steps: Maximum steps per episode allowed during sampling.
+        output_path: The directory the generated files get saved in
 
     Returns (path_to_csv_data_file, configuration object)
     """
@@ -159,16 +163,25 @@ def sample_gym_environment(gym_environment_name: str, episode_count=20, max_step
         print ("  --> finished after %d steps" % step)
     
     df = df.astype({'EPISODE': int, 'STEP': int})
-    time = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
-    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../sample_output')
+    final_dir_name = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
+
+    env_dir_path = os.path.join(output_path, gym_environment_name)
+    final_dir_path = os.path.join(env_dir_path, final_dir_name)
+    try:
+        os.mkdir(env_dir_path)
+    except FileExistsError:
+        print('There already is a folder for this gym environment')
+    os.mkdir(final_dir_path)
 
     #./ sample_output /
-    data_file = f'{path}/{gym_environment_name.lower()}_{time}_sampled_data.csv'
+    data_file = f'{final_dir_path}/data.csv'
     df.to_csv(data_file, sep=',', encoding='utf-8', index=False)
 
-    config_file = f'{path}/{gym_environment_name.lower()}_{time}_config.yaml'
+    config_file = f'{final_dir_path}/config.yaml'
     config = __generate_config_yaml_file(action_col_names, observation_col_names, action_config,
                                          output=config_file, data_file=data_file,
                                          env_name=gym_environment_name)
 
-    return data_file, config
+    print(f"Data and config saved in: {final_dir_path}")
+
+    return data_file, config, final_dir_path

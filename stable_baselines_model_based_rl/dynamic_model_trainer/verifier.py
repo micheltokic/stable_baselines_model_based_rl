@@ -5,9 +5,12 @@ import numpy as np
 import os
 import matplotlib.pyplot as plt
 from datetime import datetime
+from shutil import copyfile, copy2
+
+from utils.configuration import Configuration
 
 
-def evaluate_model(data_frame, input_col_names, action_col_names, target_col_names, window_size, mean, std, plot=True):
+def evaluate_model(data_frame, input_col_names, action_col_names, target_col_names, lag):
     """
     Measures model quality and displays plotted results on demand
 
@@ -16,8 +19,7 @@ def evaluate_model(data_frame, input_col_names, action_col_names, target_col_nam
         input_col_names: Names of the inputs
         action_col_names: Names of the action inputs
         target_col_names: Names of the targets
-        window_size: Number of past time steps that are taken into account
-        plot: Specifies whether plotting is desired
+        lag: Number of past time steps that are taken into account
 
     Todo:
     * fix plotting error: ValueError: x and y must have same first dimension, but have shapes (0,) and (64,)
@@ -34,7 +36,7 @@ def evaluate_model(data_frame, input_col_names, action_col_names, target_col_nam
     model = tf.keras.models.load_model(f"{model_output_path}model.h5.bestValLoss", compile=False)
 
     # FIFO-buffer that keeps the neural state
-    stateBuffer = collections.deque(maxlen=window_size)
+    stateBuffer = collections.deque(maxlen=lag)
 
     # outputs of neural network will be stored here
     d = {"EPISODE": [], "STEP": []}
@@ -45,7 +47,7 @@ def evaluate_model(data_frame, input_col_names, action_col_names, target_col_nam
     for i in range(0, len_dfEval):
 
         # estimation of first state
-        if i < window_size:
+        if i < lag:
             state_data = np.float64([dfEval[input_col_names[j]].values[i] for j in range(0, len(input_col_names))])
 
             # state_data = np.float64([dfEval[CART_POS].values[i], dfEval[CART_VEL].values[i],
@@ -60,7 +62,7 @@ def evaluate_model(data_frame, input_col_names, action_col_names, target_col_nam
 
             # recall of neural network
             state = np.array([list(stateBuffer)])
-            if i == window_size:
+            if i == lag:
                 print(state)
             netOutput = model.predict(np.float64(state))[0]
 
@@ -72,13 +74,12 @@ def evaluate_model(data_frame, input_col_names, action_col_names, target_col_nam
             dfEval_actions = np.float64([dfEval[action_col_name].values[i] for action_col_name in action_col_names])
             stateBuffer.append(np.concatenate((dfEval_actions, netOutput)))
 
-    if plot:
-        __plot_results(input_col_names, action_col_names, dfNet, dfEval, window_size, mean, std)
+    return dfNet, dfEval
 
 
-def __plot_results(input_col_names, action_col_names, dfNet, dfEval, window_size, mean, std):
+def plot_results(input_col_names, action_col_names, dfNet, dfEval, window_size, mean, std):
     now_str = datetime.now().strftime("%d%m%Y-%H%M%S")
-    fig, axs = plt.subplots(len(input_col_names)+1, 1, figsize=(10, 15))
+    fig, axs = plt.subplots(len(input_col_names) + 1, 1, figsize=(10, 15))
 
     # TODO
     for i in range(len(input_col_names)):
@@ -90,9 +91,35 @@ def __plot_results(input_col_names, action_col_names, dfNet, dfEval, window_size
 
         axs[i].grid()
         axs[i].legend(loc="best")
-        
-    # plot std & mean
-    axs[len(input_col_names)].errorbar(range(len(mean)), mean, std, linestyle='None', marker='^')
 
-    fig.savefig(f'plots/plot-{window_size}-{now_str}.png')
+    # plot std & mean
+    # axs[len(input_col_names)].errorbar(range(len(mean)), mean, std, linestyle='None', marker='^')
+
     plt.show()
+
+    return fig
+
+
+def save(final_dir_path, model, loss, lag, fig, config, data_path):
+    root_path, _, last_folder_name = final_dir_path.rpartition(os.path.sep)
+    rounded_lag = "{:.2f}".format(round(lag, 4))
+    new_folder_name = f'loss={loss}-lag={rounded_lag}-{last_folder_name}'
+    new_dir_path = os.path.join(root_path, new_folder_name)
+
+    try:
+        os.rename(final_dir_path, new_dir_path)
+    except PermissionError:
+        print(f'Permission Error: folder {final_dir_path} could not be renamed to {final_dir_path}')
+
+    final_dir_path = new_dir_path
+
+    if config.get('dynamic_model.utility_flags.export_model'):
+        model.save(f'{final_dir_path}/model.h5')
+
+    fig.savefig(f'{final_dir_path}/plot.png')
+
+    if not os.path.isfile(os.path.join(final_dir_path, 'data.csv')):
+        copy2(data_path, final_dir_path)
+
+    if not os.path.isfile(os.path.join(final_dir_path, 'config.yaml')):
+        config.save_config(file=os.path.join(final_dir_path, "config.yaml"))
