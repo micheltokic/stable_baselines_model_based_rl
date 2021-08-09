@@ -1,5 +1,6 @@
 import random
 import numpy as np
+from numpy.core.arrayprint import DatetimeFormat
 
 
 def add_fake_noise(data, observation_columns, noise):
@@ -29,11 +30,15 @@ def add_fake_noise(data, observation_columns, noise):
 
     return noisy_data
 
-
-def add_gaussian_noise(data, observation_columns, mean=0, std=0, percentage=0.5):
-    obs_data = data[observation_columns]
-    noise = np.random.normal(mean, std, obs_data.shape)
-    noise_indices = np.random.randint(0, len(obs_data), int(len(obs_data) * percentage))
-    obs_data.loc[noise_indices] += noise[noise_indices]
-    data[observation_columns] = obs_data
+def add_gaussian_noise(data, observation_columns, calc_mean=True, mean=0, std=0, percentage=0.5):
+    # always apply noise in rows (= noise_indices) on all column values (observations)
+    noise_indices = random.sample(range(1, len(data)), int(len(data)*percentage))
+    if calc_mean:
+        for col in observation_columns:
+            col_mean = data[col].mean()
+            noise = np.random.normal(col_mean, std, data[col].shape)
+            data[col].loc[noise_indices] += noise[noise_indices]
+    else:
+        noise = np.random.normal(mean, std, data[observation_columns].shape)
+        data.loc[noise_indices] += noise[noise_indices]
     return data
