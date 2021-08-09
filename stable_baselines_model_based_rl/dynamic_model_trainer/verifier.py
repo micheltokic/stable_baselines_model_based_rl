@@ -93,7 +93,7 @@ def plot_results(input_col_names, action_col_names, dfNet, dfEval, window_size, 
         axs[i].legend(loc="best")
 
     # plot std & mean
-    # axs[len(input_col_names)].errorbar(range(len(mean)), mean, std, linestyle='None', marker='^')
+    axs[len(input_col_names)].errorbar(range(len(mean)), mean, std, linestyle='None', marker='^')
 
     plt.show()
 

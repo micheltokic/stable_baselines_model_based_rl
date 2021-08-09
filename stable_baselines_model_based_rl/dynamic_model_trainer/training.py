@@ -70,12 +70,9 @@ def build_and_train_dynamic_model(data_path, config: Configuration, output_path=
     # optimizer.learning_rate.assign(config.get('dynamic_model.training.learning_rate', 0.1))
 
     artificial_noise = config.get('dynamic_model.utility_flags.artificial_noise', True)
-    noise_settings = []
+    noise_settings = {}
     if artificial_noise:
-        mean = config.get('dynamic_model.validation.noise.mean')
-        std = config.get('dynamic_model.validation.noise.std')
-        percentage = config.get('dynamic_model.validation.noise.percentage')
-        noise_settings = [mean, std, percentage]
+        noise_settings = config.get('dynamic_model.model.config.noise')
 
     train_data, val_data, input_shape, mean_in, std_in, mean_out, std_out = \
         tensorflow_data_generator.prepare_data(data_frame, input_col_names, target_col_names,
@@ -108,10 +105,10 @@ def build_and_train_dynamic_model(data_path, config: Configuration, output_path=
         dfNet, dfEval = verifier.evaluate_model(data_frame, input_col_names, action_col_names, target_col_names,
                                                 lag)
         if config.get('dynamic_model.utility_flags.plot_results'):
-            fig = verifier.plot_results(input_col_names, action_col_names, dfNet, dfEval, lag, mean, std)
+            fig = verifier.plot_results(input_col_names, action_col_names, dfNet, dfEval, lag, mean_in, std_in)
 
             if config.get('dynamic_model.utility_flags.save'):
-                verifier.save(output_path, model, history.history['val_loss'][len(history.history['val_loss']) - 1], lag, fig,
-                              config, data_path)
+                verifier.save(output_path, model, history.history['val_loss'][len(history.history['val_loss']) - 1],
+                              lag, fig, config, data_path)
 
     return model

@@ -18,6 +18,7 @@ def prepare_data(df, input_col, target_col, window_size, training_batch_size=10,
         training_batch_size: Bach size used for training
         validation_batch_size: Bach size used for validation
         training_pattern_percent: Relationship between training and validation data
+        noise_settings: noise settings
 
     Returns:
         train_data: Training data set
@@ -30,6 +31,7 @@ def prepare_data(df, input_col, target_col, window_size, training_batch_size=10,
     """
     
     if noise_settings:
+        print("Generate noise on the target vectors")
         df = add_gaussian_noise(df, target_col, **noise_settings)
     
     ((x_train_multi, y_train_multi), (x_val_multi, y_val_multi)), mean_in, std_in, mean_out, std_out = \
