@@ -49,10 +49,9 @@ dynamic_model:
               config:
                 units: 4
                 activation: relu
-
     validation:
         noise:
-            mean: 0
+            calc_mean: false
             std: 0.1
             percentage: 0.5
 

@@ -72,7 +72,7 @@ def build_and_train_dynamic_model(data_path, config: Configuration, output_path=
     artificial_noise = config.get('dynamic_model.utility_flags.artificial_noise', True)
     noise_settings = {}
     if artificial_noise:
-        noise_settings = config.get('dynamic_model.model.config.noise')
+        noise_settings = config.get('dynamic_model.validation.noise')
 
     train_data, val_data, input_shape, mean_in, std_in, mean_out, std_out = \
         tensorflow_data_generator.prepare_data(data_frame, input_col_names, target_col_names,

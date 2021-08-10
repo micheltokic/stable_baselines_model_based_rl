@@ -30,15 +30,17 @@ def add_fake_noise(data, observation_columns, noise):
 
     return noisy_data
 
-def add_gaussian_noise(data, observation_columns, calc_mean=True, mean=0, std=0, percentage=0.5):
-    # always apply noise in rows (= noise_indices) on all column values (observations)
+def add_gaussian_noise(data, observation_columns, calc_mean=True, std=0, percentage=0.5):
+    # always apply noise in the same rows (= noise_indices) on all observations
     noise_indices = random.sample(range(1, len(data)), int(len(data)*percentage))
-    if calc_mean:
-        for col in observation_columns:
+    for col in observation_columns:
+        if calc_mean:
             col_mean = data[col].mean()
             noise = np.random.normal(col_mean, std, data[col].shape)
-            data[col].loc[noise_indices] += noise[noise_indices]
-    else:
-        noise = np.random.normal(mean, std, data[observation_columns].shape)
-        data.loc[noise_indices] += noise[noise_indices]
+        else:
+            noise = np.empty((data.shape[0]))
+            # use every single observation value as mean, so that the noise is adequate to each value 
+            for index, data_point in enumerate(data[col]): 
+                noise[index] = np.random.normal(data_point, std, 1)[0]
+        data[col].loc[noise_indices] += noise[noise_indices]
     return data
