@@ -1,16 +1,19 @@
 <!-- markdownlint-disable -->
 
-<a href="..\..\stable_baselines_model_based_rl\sampler\gym_sampler.py#L0"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/micheltokic/stable_baselines_model_based_rl/blob/main/stable_baselines_model_based_rl\sampler\gym_sampler.py#L0"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 # <kbd>module</kbd> `sampler.gym_sampler`
 
 
 
 
+**Global Variables**
+---------------
+- **ROOT_DIR**
 
 ---
 
-<a href="..\..\stable_baselines_model_based_rl\sampler\gym_sampler.py#L97"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/micheltokic/stable_baselines_model_based_rl/blob/main/stable_baselines_model_based_rl\sampler\gym_sampler.py#L104"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ## <kbd>function</kbd> `sample_gym_environment`
 
@@ -18,7 +21,8 @@
 sample_gym_environment(
     gym_environment_name: str,
     episode_count=20,
-    max_steps=100
+    max_steps=100,
+    output_path='d:\\development\\stable_baselines_model_based_rl\\sample_output'
 )
 ```
 
@@ -35,8 +39,9 @@ Two files are created:
  - <b>`gym_environment_name`</b>:  Name of the Gym-Environment to sample. 
  - <b>`epsiode_count`</b>:  Amount of episodes to use for the sampling. 
  - <b>`max_steps`</b>:  Maximum steps per episode allowed during sampling. 
+ - <b>`output_path`</b>:  The directory the generated files get saved in 
 
-Returns (path_to_csv_data_file, path_to_yaml_config_file) 
+Returns (path_to_csv_data_file, configuration object) 
 
 
 

@@ -1,6 +1,6 @@
 <!-- markdownlint-disable -->
 
-<a href="..\..\stable_baselines_model_based_rl\dynamic_model_trainer\tensorflow_data_generator.py#L0"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/micheltokic/stable_baselines_model_based_rl/blob/main/stable_baselines_model_based_rl\dynamic_model_trainer\tensorflow_data_generator.py#L0"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 # <kbd>module</kbd> `dynamic_model_trainer.tensorflow_data_generator`
 
@@ -10,7 +10,7 @@
 
 ---
 
-<a href="..\..\stable_baselines_model_based_rl\dynamic_model_trainer\tensorflow_data_generator.py#L6"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/micheltokic/stable_baselines_model_based_rl/blob/main/stable_baselines_model_based_rl\dynamic_model_trainer\tensorflow_data_generator.py#L6"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ## <kbd>function</kbd> `prepare_data`
 
@@ -22,7 +22,8 @@ prepare_data(
     window_size,
     training_batch_size=10,
     validation_batch_size=10,
-    training_pattern_percent=0.7
+    training_pattern_percent=0.7,
+    noise_settings={}
 )
 ```
 
@@ -39,6 +40,7 @@ Reads the data of the data frame, Converts them into a dataset readable by tenso
  - <b>`training_batch_size`</b>:  Bach size used for training 
  - <b>`validation_batch_size`</b>:  Bach size used for validation 
  - <b>`training_pattern_percent`</b>:  Relationship between training and validation data 
+ - <b>`noise_settings`</b>:  noise settings 
 
 
 
