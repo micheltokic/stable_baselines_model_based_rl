@@ -13,12 +13,17 @@ input_config:
         - A_1
     action_type: DISCRETE  # one of: DISCRETE, MULTI_DISCRETE, BOX
     discrete_colum_sets: null
-    box_bounds: null
+    action_box_bounds:
+        low: null
+        high: null
     observation_cols:
         - X_0
         - X_1
         - X_2
         - X_3
+    observation_bounds:
+        low: null
+        high: null
     input_file_name: 'train.csv'
 
 #
@@ -49,6 +54,7 @@ dynamic_model:
               config:
                 units: 4
                 activation: relu
+
     validation:
         noise:
             calc_mean: false
@@ -62,6 +68,17 @@ dynamic_model:
         plot_results: True
         export_model: True
         artificial_noise: True
+
+#
+# Model Wrapping
+#
+model_wrapping:
+    reward:
+        type: CONSTANT  # one of CONSTANT, EVAL, or HANDLER
+        value: 1.0
+    done:
+        type: CONSTANT  # one of CONSTANT, EVAL, or HANDLER
+        value: 200
 
 #
 # Policy Configuration

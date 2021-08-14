@@ -37,20 +37,21 @@ def __get_action_columns_and_sets(action_space: space):
         }
     
     elif isinstance(action_space, MultiDiscrete):
-        pass  # todo
+        raise NotImplementedError('Not yet supported!')  # todo
     
     elif isinstance(action_space, Box):
         action_columns = []
-        bounds = {}
         for i in range(action_space.shape[0]):
             col_name = f'A_{i}'
             action_columns.append(col_name)
-            bounds[col_name] = [float(action_space.low[i]), float(action_space.high[i])]
         action_config = {
             'type': 'BOX',
             'col_names': action_columns,
             'dimensions': action_space.shape[0],
-            'box_bounds': bounds
+            'box_bounds': {
+                'low': list(action_space.low),
+                'high': list(action_space.high),
+            }
         }
     
     return action_columns, action_config
@@ -73,7 +74,7 @@ def __map_sampled_action_to_columns(action_space: space, action_config, sample_a
         return dict(zip(cols, values))
 
 
-def __generate_config_yaml_file(action_cols, observation_cols, action_config,
+def __generate_config_yaml_file(action_cols, observation_cols, action_config, obs_space: Box,
                                 output='./sampled_config_gym.yaml', data_file=None,
                                 env_name='unknown') -> Configuration:
     path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
@@ -89,7 +90,12 @@ def __generate_config_yaml_file(action_cols, observation_cols, action_config,
         config.set('input_config.input_file_name', os.path.abspath(data_file))
 
     if action_config['type'] == 'BOX':
-        config.set('input_config.box_bounds', dict(action_config['box_bounds']))
+        config.set('input_config.action_box_bounds', dict(action_config['box_bounds']))
+
+    if isinstance(obs_space, Box):
+        config.set('input_config.observation_bounds.low', [float(x) for x in list(obs_space.low)])
+        config.set('input_config.observation_bounds.high',
+                   [float(x) for x in list(obs_space.high)])
     
     config.save_config(file=output)
     return config
@@ -179,8 +185,8 @@ def sample_gym_environment(gym_environment_name: str, episode_count=20, max_step
 
     config_file = f'{final_dir_path}/config.yaml'
     config = __generate_config_yaml_file(action_col_names, observation_col_names, action_config,
-                                         output=config_file, data_file=data_file,
-                                         env_name=gym_environment_name)
+                                         observation_space, output=config_file,
+                                         data_file=data_file, env_name=gym_environment_name)
 
     print(f"Data and config saved in: {final_dir_path}")
 
