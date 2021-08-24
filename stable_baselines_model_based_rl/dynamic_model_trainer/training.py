@@ -1,11 +1,12 @@
 import os
 from copy import deepcopy
+from datetime import datetime
 
 import keras
 import pandas as pd
 
 from definitions import ROOT_DIR
-from stable_baselines_model_based_rl.dynamic_model_trainer import tensorflow_data_generator, model_builder, verifier
+from stable_baselines_model_based_rl.dynamic_model_trainer import prepare_data, model_builder, verifier
 from stable_baselines_model_based_rl.utils.configuration import Configuration
 
 import stable_baselines_model_based_rl.sampler.gym_sampler as sampler
@@ -25,8 +26,8 @@ def sample_environment_and_train_dynamic_model(gym_environment_name, episode_cou
         lstm_model: The lstm model trained on the given dataset
     """
 
-    data_file_name, config, final_dir_path = sampler.sample_gym_environment(gym_environment_name, episode_count, max_steps, output_path)
-    return build_and_train_dynamic_model(data_file_name, config, final_dir_path)
+    df, config = sampler.__sample_gym_environment(gym_environment_name, episode_count, max_steps)
+    return __build_and_train_dynamic_model(df, config, output_path)
 
 
 def build_and_train_dynamic_model(data_path, config: Configuration, output_path=ROOT_DIR):
@@ -45,18 +46,14 @@ def build_and_train_dynamic_model(data_path, config: Configuration, output_path=
     Todo:
     * evaluation, plotting configuration into yaml file?
     """
-    data_frame = pd.read_csv(data_path)
+    df = pd.read_csv(data_path)
+    return __build_and_train_dynamic_model(df, config, output_path)
 
-    config_dict = deepcopy(config.config)
 
-    print("Configuration dictionary: ", config_dict)
-
+def __build_and_train_dynamic_model(df: pd.DataFrame, config: Configuration, output_path=ROOT_DIR):
     target_col_names = config.get('input_config.observation_cols')
     action_col_names = config.get('input_config.action_cols')
     input_col_names = action_col_names + target_col_names
-
-    # model_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../model_output/model.h5')
-
     max_epochs = config.get('dynamic_model.training.max_epochs', 100)
     train_test_ration = config.get('dynamic_model.training.train_test_ration', 0.7)
     steps_per_epoch = config.get('dynamic_model.training.steps_per_epoch', 1000)
@@ -74,11 +71,19 @@ def build_and_train_dynamic_model(data_path, config: Configuration, output_path=
     if artificial_noise:
         noise_settings = config.get('dynamic_model.validation.noise')
 
+    final_dir_name = datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
+    output_path = os.path.join(output_path, final_dir_name)
+    try:
+        os.mkdir(output_path)
+        print("Created Folder: ", output_path)
+    except:
+        print("folder already exists")
+
     train_data, val_data, input_shape, mean_in, std_in, mean_out, std_out = \
-        tensorflow_data_generator.prepare_data(data_frame, input_col_names, target_col_names,
-                                               window_size=lag,
-                                               training_pattern_percent=train_test_ration,
-                                               noise_settings=noise_settings)
+        prepare_data.prepare_data(df, input_col_names, target_col_names,
+                                  window_size=lag,
+                                  training_pattern_percent=train_test_ration,
+                                  noise_settings=noise_settings)
 
     callbacks = [keras.callbacks.EarlyStopping(monitor="loss", patience=patience, restore_best_weights=True,
                                                verbose=True)]
@@ -102,13 +107,13 @@ def build_and_train_dynamic_model(data_path, config: Configuration, output_path=
     model.summary()
 
     if config.get('dynamic_model.utility_flags.evaluate_model'):
-        dfNet, dfEval = verifier.evaluate_model(data_frame, input_col_names, action_col_names, target_col_names,
+        dfNet, dfEval = verifier.evaluate_model(model, df, input_col_names, action_col_names, target_col_names,
                                                 lag)
         if config.get('dynamic_model.utility_flags.plot_results'):
             fig = verifier.plot_results(input_col_names, action_col_names, dfNet, dfEval, lag, mean_in, std_in)
 
             if config.get('dynamic_model.utility_flags.save'):
                 verifier.save(output_path, model, history.history['val_loss'][len(history.history['val_loss']) - 1],
-                              lag, fig, config, data_path)
+                              lag, fig, config, df)
 
     return model

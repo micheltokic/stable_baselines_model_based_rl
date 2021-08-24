@@ -1,6 +1,9 @@
+from sklearn.compose import ColumnTransformer
 from stable_baselines_model_based_rl.utils.noise import add_fake_noise, add_gaussian_noise
 import tensorflow as tf
 import numpy as np
+import pandas as pd
+from sklearn.preprocessing import StandardScaler
 
 
 def prepare_data(df, input_col, target_col, window_size, training_batch_size=10, validation_batch_size=10,
@@ -29,11 +32,11 @@ def prepare_data(df, input_col, target_col, window_size, training_batch_size=10,
         mean_out: Mean of the targets
         std_out: Standard deviation of the targets
     """
-    
+
     if noise_settings:
         print("Generate noise on the target vectors")
         df = add_gaussian_noise(df, target_col, **noise_settings)
-    
+
     ((x_train_multi, y_train_multi), (x_val_multi, y_val_multi)), mean_in, std_in, mean_out, std_out = \
         __create_training_data(df, input_col, target_col, window_size=window_size,
                                training_pattern_percent=training_pattern_percent)
@@ -62,12 +65,27 @@ def __create_training_data(data, input_col, target_col, window_size=1, training_
     mean_out, std_out = __mean_and_std(target_col, data_train)
     # data_plot.plot_hist_df(data_train, input_col)
     # data_plot.plot_timeseries_df(data_train, input_col)
-    print(f"mean in = {mean_in}")
-    print(f"std in = {std_in}")
+
     print(f"mean out =  {mean_out}")
     print(f"std out = {std_out}")
 
+    print(f"mean in = {mean_in}")
+    print(f"std in = {std_in}")
+
     grouped = data_train.groupby(['EPISODE'])
+
+    columns = data_train.columns
+
+    data_train = __normalize(data_train, target_col)
+
+    # data_train = pd.DataFrame(data_train, columns=columns)
+
+    mean_in, std_in = __mean_and_std(input_col, data_train)
+    mean_out, std_out = __mean_and_std(target_col, data_train)
+    # data_plot.plot_hist_df(data_train, input_col)
+    # data_plot.plot_timeseries_df(data_train, input_col)
+    print(f"mean in = {mean_in}")
+    print(f"std in = {std_in}")
 
     inputs_all = []
     labels_all = []
@@ -142,3 +160,15 @@ def __multivariate_data(dataset, target, start_index, end_index, history_size,
             labels.append(target[i:i + target_size])
 
     return np.array(data), np.array(labels)
+
+
+def __normalize(df, columns):
+    result = df.copy()
+    for feature_name in columns:
+        # max_value = df[feature_name].max()
+        # min_value = df[feature_name].min()
+        # result[feature_name] = (df[feature_name] - min_value) / (max_value - min_value)
+
+        result[feature_name] = (df[feature_name] - np.average(df[feature_name])) / (np.std(df[feature_name]))
+
+    return result

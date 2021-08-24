@@ -1,0 +1,70 @@
+dynamic_model:
+  keras_model:
+    class_name: Sequential
+    config:
+      layers:
+      - class_name: LSTM
+        config:
+          units: 64
+      name: my_net
+  training:
+    batch_size: 8
+    lag: 4
+    learning_rate: 0.0001
+    loss: mse
+    max_epochs: 1000
+    optimizer: RMSprop
+    patience: 50
+    steps_per_epoch: 100
+    train_test_ration: 0.7
+    validation_freq: 1
+    validation_steps: 100
+  utility_flags:
+    artificial_noise: false
+    evaluate_model: true
+    export_model: true
+    log_training: true
+    plot_results: true
+    save: true
+  validation:
+    noise:
+      calc_mean: false
+      percentage: 0.5
+      std: 0.1
+gym_sampling:
+  gym_environment_name: CartPole-v1
+input_config:
+  action_box_bounds:
+    high: null
+    low: null
+  action_cols:
+  - A_0
+  - A_1
+  action_type: DISCRETE
+  discrete_colum_sets: null
+  input_file_name: C:\Users\jonas\Documents\stable_baselines_model_based_rl\example_usage\CartPole-v1\2021-08-17-08-55-28\data.csv
+  observation_bounds:
+    high:
+    - 4.800000190734863
+    - 3.4028234663852886e+38
+    - 0.41887903213500977
+    - 3.4028234663852886e+38
+    low:
+    - -4.800000190734863
+    - -3.4028234663852886e+38
+    - -0.41887903213500977
+    - -3.4028234663852886e+38
+  observation_cols:
+  - X_0
+  - X_1
+  - X_2
+  - X_3
+model_wrapping:
+  done:
+    type: CONSTANT
+    value: 200
+  reward:
+    type: CONSTANT
+    value: 1.0
+policy:
+  reinforcement_learning_algorithm: PPO

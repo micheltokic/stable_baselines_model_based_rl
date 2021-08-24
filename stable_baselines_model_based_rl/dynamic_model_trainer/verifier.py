@@ -7,12 +7,15 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 from shutil import copyfile, copy2
 
+from definitions import ROOT_DIR
 
-def evaluate_model(data_frame, input_col_names, action_col_names, target_col_names, lag):
+
+def evaluate_model(model, data_frame, input_col_names, action_col_names, target_col_names, lag):
     """
     Measures model quality and displays plotted results on demand
 
     Args:
+        model: Model
         data_frame: Data
         input_col_names: Names of the inputs
         action_col_names: Names of the action inputs
@@ -30,8 +33,8 @@ def evaluate_model(data_frame, input_col_names, action_col_names, target_col_nam
     dfEval = data_frame[data_frame.EPISODE == row_max_steps.EPISODE]
     dfEval.describe()
 
-    model_output_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../model_output/')
-    model = tf.keras.models.load_model(f"{model_output_path}model.h5.bestValLoss", compile=False)
+    # model_output_path = os.path.join(ROOT_DIR, '../../model_output/')
+    # model = tf.keras.models.load_model(f"{model_output_path}model.h5.bestValLoss", compile=False)
 
     # FIFO-buffer that keeps the neural state
     stateBuffer = collections.deque(maxlen=lag)
@@ -98,26 +101,23 @@ def plot_results(input_col_names, action_col_names, dfNet, dfEval, window_size, 
     return fig
 
 
-def save(final_dir_path, model, loss, lag, fig, config, data_path):
-    root_path, _, last_folder_name = final_dir_path.rpartition(os.path.sep)
-    rounded_lag = "{:.2f}".format(round(lag, 4))
-    new_folder_name = f'loss={loss}-lag={rounded_lag}-{last_folder_name}'
-    new_dir_path = os.path.join(root_path, new_folder_name)
-
-    try:
-        os.rename(final_dir_path, new_dir_path)
-    except PermissionError:
-        print(f'Permission Error: folder {final_dir_path} could not be renamed to {final_dir_path}')
-
-    final_dir_path = new_dir_path
+def save(final_dir_path, model, loss, lag, fig, config, df):
+    df.to_csv(os.path.join(final_dir_path, 'data.csv'), sep=',', encoding='utf-8', index=False)
+    config.save_config(file=os.path.join(final_dir_path, "config.yaml"))
 
     if config.get('dynamic_model.utility_flags.export_model'):
         model.save(f'{final_dir_path}/model.h5')
 
     fig.savefig(f'{final_dir_path}/plot.png')
 
-    if not os.path.isfile(os.path.join(final_dir_path, 'data.csv')):
-        copy2(data_path, final_dir_path)
+    root_path, _, last_folder_name = final_dir_path.rpartition(os.path.sep)
+    rounded_lag = "{:.2f}".format(round(lag, 4))
+    new_folder_name = f'loss={loss}-lag={rounded_lag}-{last_folder_name}'
+    new_dir_path = os.path.join(root_path, new_folder_name)
+    try:
+        os.rename(final_dir_path, new_dir_path)
+        final_dir_path = new_dir_path
+    except PermissionError:
+        print(f'Permission Error: folder {final_dir_path} could not be renamed to {final_dir_path}')
 
-    if not os.path.isfile(os.path.join(final_dir_path, 'config.yaml')):
-        config.save_config(file=os.path.join(final_dir_path, "config.yaml"))
+    print(f"Training and model saved to {final_dir_path}")
