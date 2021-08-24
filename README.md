@@ -1,3 +1,6 @@
+TODO 
+in jedem fall: Daten normalisieren - mittelwert (0) varianz (1) 
+
 # Model Based Reinforcement Learning for Stable Baselines
 A model based RL extension for stable baselines.
 
