@@ -1,9 +1,7 @@
-from sklearn.compose import ColumnTransformer
 from stable_baselines_model_based_rl.utils.noise import add_fake_noise, add_gaussian_noise
 import tensorflow as tf
 import numpy as np
 import pandas as pd
-from sklearn.preprocessing import StandardScaler
 
 
 def prepare_data(df, input_col, target_col, window_size, training_batch_size=10, validation_batch_size=10,
