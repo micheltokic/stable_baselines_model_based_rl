@@ -67,7 +67,7 @@ dynamic_model:
         evaluate_model: True
         plot_results: True
         export_model: True
-        artificial_noise: True
+        artificial_noise: False
 
 #
 # Model Wrapping
