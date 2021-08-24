@@ -1,5 +1,5 @@
 .vscode
-*.csv
+# *.csv
 
 __pycache__
 *.egg-info
