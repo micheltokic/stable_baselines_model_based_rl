@@ -79,7 +79,7 @@ def __build_and_train_dynamic_model(df: pd.DataFrame, config: Configuration, out
     except:
         print("folder already exists")
 
-    train_data, val_data, input_shape, mean_in, std_in, mean_out, std_out = \
+    train_data, val_data, test_data, input_shape, mean_in, std_in, mean_out, std_out = \
         prepare_data.prepare_data(df, input_col_names, target_col_names,
                                   window_size=lag,
                                   training_pattern_percent=train_test_ration,
@@ -109,8 +109,9 @@ def __build_and_train_dynamic_model(df: pd.DataFrame, config: Configuration, out
     if config.get('dynamic_model.utility_flags.evaluate_model'):
         dfNet, dfEval = verifier.evaluate_model(model, df, input_col_names, action_col_names, target_col_names,
                                                 lag)
+        dfDiff = verifier.evaluate_model_with_test_data(model, test_data, input_col_names, action_col_names, target_col_names)
         if config.get('dynamic_model.utility_flags.plot_results'):
-            fig = verifier.plot_results(input_col_names, action_col_names, dfNet, dfEval, lag, mean_in, std_in)
+            fig = verifier.plot_results(input_col_names, action_col_names, dfNet, dfEval, dfDiff, lag, mean_in, std_in)
 
             if config.get('dynamic_model.utility_flags.save'):
                 verifier.save(output_path, model, history.history['val_loss'][len(history.history['val_loss']) - 1],

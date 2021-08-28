@@ -35,7 +35,7 @@ def prepare_data(df, input_col, target_col, window_size, training_batch_size=10,
         print("Generate noise on the target vectors")
         df = add_gaussian_noise(df, target_col, **noise_settings)
 
-    ((x_train_multi, y_train_multi), (x_val_multi, y_val_multi)), mean_in, std_in, mean_out, std_out = \
+    ((x_train_multi, y_train_multi), (x_val_multi, y_val_multi)), test_data, mean_in, std_in, mean_out, std_out = \
         __create_training_data(df, input_col, target_col, window_size=window_size,
                                training_pattern_percent=training_pattern_percent)
 
@@ -53,7 +53,7 @@ def prepare_data(df, input_col, target_col, window_size, training_batch_size=10,
     val_data = tf.data.Dataset.from_tensor_slices((x_val_multi, y_val_multi))
     val_data = val_data.batch(validation_batch_size).repeat()
     input_shape = x_train_multi[0].shape[-2:]
-    return train_data, val_data, input_shape, mean_in, std_in, mean_out, std_out
+    return train_data, val_data, test_data, input_shape, mean_in, std_in, mean_out, std_out
 
 
 def __create_training_data(data, input_col, target_col, window_size=1, training_pattern_percent=0.7):
@@ -74,7 +74,14 @@ def __create_training_data(data, input_col, target_col, window_size=1, training_
 
     columns = data_train.columns
 
+    # extract 5 percent of entries for testing
+    length = len(data_train)
+    test_split = int(0.05 * length)
+    test_data = data_train[:test_split] 
+    data_train = data_train.iloc[test_split:]
+
     data_train = __normalize(data_train, target_col)
+
 
     # data_train = pd.DataFrame(data_train, columns=columns)
 
@@ -109,18 +116,18 @@ def __create_training_data(data, input_col, target_col, window_size=1, training_
             labels_all.append(labels[i])
 
     length = len(inputs_all)
-
+    
     c = list(zip(inputs_all, labels_all))
     np.random.shuffle(c)
     inputs_all, labels_all = zip(*c)
-
+    
     split = int(training_pattern_percent * length)
 
     inputs_all = np.array(inputs_all)
     labels_all = np.array(labels_all)
 
     return ((inputs_all[0:split], labels_all[0:split]),
-            (inputs_all[split:], labels_all[split:])), mean_in, std_in, mean_out, std_out
+            (inputs_all[split:], labels_all[split:])), test_data, mean_in, std_in, mean_out, std_out
 
 
 def __mean_and_std(columns, data):
