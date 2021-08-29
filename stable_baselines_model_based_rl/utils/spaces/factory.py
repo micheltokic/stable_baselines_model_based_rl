@@ -1,3 +1,4 @@
+from gym.spaces.multi_discrete import MultiDiscrete
 from stable_baselines_model_based_rl.utils.spaces.discrete import DiscreteSpaceValue
 from gym.spaces.discrete import Discrete
 from stable_baselines_model_based_rl.utils.spaces.base import SpaceType, SpaceValue
@@ -26,8 +27,10 @@ def space_value_from_gym(gym_space: GymSpace, value,
     
     if isinstance(gym_space, Box):
         space_class = BoxSpaceValue
-    if isinstance(gym_space, Discrete):
+    elif isinstance(gym_space, Discrete):
         space_class = DiscreteSpaceValue
+    elif isinstance(gym_space, MultiDiscrete):
+        raise NotImplementedError('No support for MultiDiscrete, yet!')
     else:
         raise Exception('Unkown or not supported gym space!')
 
