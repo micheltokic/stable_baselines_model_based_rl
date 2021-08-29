@@ -10,123 +10,63 @@ from gym.spaces.multi_discrete import MultiDiscrete
 
 from definitions import ROOT_DIR
 from stable_baselines_model_based_rl.utils.configuration import Configuration
+from stable_baselines_model_based_rl.utils.spaces.base import SpaceType
+from stable_baselines_model_based_rl.utils.spaces.factory import space_value_from_gym
 
 
-def __get_dimension(space: space):
-    """
-    Returns the dimension of a given gym (action/ observation)
-    space.
-    """
-    if isinstance(space, Discrete):
-        return 1
-    elif isinstance(space, Box):
-        return space.shape[0]
-    else:
-        return 1
-
-
-def __get_action_columns_and_sets(action_space: space):
-    action_columns = []
-    action_config = {}
-    
+def __update_action_input_config(config: Configuration, action_space: space, action_col_names):
     if isinstance(action_space, Discrete):
-        action_columns = [f'A_{i}' for i in range(action_space.n)]
-        action_config = {
-            'type': 'DISCRETE',
-            'col_names': action_columns,
-        }
-    
+        action_type = 'DISCRETE'
     elif isinstance(action_space, MultiDiscrete):
-        raise NotImplementedError('Not yet supported!')  # todo
-    
+        action_type = 'MULTI_DISCRETE'
+        raise NotImplementedError('Not yet supported!')  # TODO
     elif isinstance(action_space, Box):
-        action_columns = []
-        for i in range(action_space.shape[0]):
-            col_name = f'A_{i}'
-            action_columns.append(col_name)
-        action_config = {
-            'type': 'BOX',
-            'col_names': action_columns,
-            'dimensions': action_space.shape[0],
-            'box_bounds': {
-                'low': list(action_space.low),
-                'high': list(action_space.high),
-            }
+        action_type = 'BOX'
+        box_bounds = {
+            'low': [float(x) for x in list(action_space.low)],
+            'high': [float(x) for x in list(action_space.high)],
         }
-    
-    return action_columns, action_config
+        config.set('input_config.action_box_bounds', box_bounds)
+
+    config.set('input_config.action_type', action_type)
+    config.set('input_config.action_cols', action_col_names)
 
 
-def __map_sampled_action_to_columns(action_space: space, action_config, sample_action):
-    if isinstance(action_space, Discrete):
-        assert action_config['type'] == 'DISCRETE'
-        cols = action_config['col_names']
-        values = [1 if i == sample_action else 0 for i in range(action_space.n)]
-        return dict(zip(cols, values))
-    
-    elif isinstance(action_space, MultiDiscrete):
-        pass  # todo
-
-    elif isinstance(action_space, Box):
-        assert action_config['type'] == 'BOX'
-        cols = action_config['col_names']
-        values = list(sample_action)
-        return dict(zip(cols, values))
-
-
-def __generate_config_yaml_file(action_cols, observation_cols, action_config, obs_space: Box, data_file=None,
-                                env_name='unknown') -> Configuration:
-    path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                        '../../example_usage/sample_config.yaml')
-    config = Configuration(path)
-
-    config.set('gym_sampling.gym_environment_name', env_name)
-    
-    config.set('input_config.action_cols', action_cols)
+def __update_observation_input_config(config: Configuration, observation_cols, obs_space: Box):
     config.set('input_config.observation_cols', observation_cols)
-    config.set('input_config.action_type', action_config['type'])
-
-    if action_config['type'] == 'BOX':
-        config.set('input_config.action_box_bounds', dict(action_config['box_bounds']))
 
     if isinstance(obs_space, Box):
         config.set('input_config.observation_bounds.low', [float(x) for x in list(obs_space.low)])
         config.set('input_config.observation_bounds.high',
                    [float(x) for x in list(obs_space.high)])
 
-    return config
-
 
 def __sample_gym_environment(gym_environment_name: str, episode_count=20, max_steps=100):
+    config = Configuration(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                        '../../example_usage/sample_config.yaml'))
     env = gym.make(gym_environment_name)
     # for details see: https://github.com/openai/gym/blob/master/gym/envs/classic_control/cartpole.py
     env.np_random.seed(0)
     env.action_space.np_random.seed(0)
 
-    action_col_names, action_config = __get_action_columns_and_sets(env.action_space)
-    observation_space = env.observation_space
+    action_col_names = space_value_from_gym(env.action_space, env.action_space.sample(),
+                                            SpaceType.ACTION).column_names
+    observation_col_names = space_value_from_gym(env.observation_space,
+                                                 env.observation_space.sample()).column_names
+    __update_action_input_config(config, env.action_space, action_col_names)
+    __update_observation_input_config(config, observation_col_names, env.observation_space)
+    config.set('gym_sampling.gym_environment_name', gym_environment_name)
 
-    ### PREPARE DATA FRAME
-    d = {}
-    # Counters for episode and step
-    d["EPISODE"] = []
-    d["STEP"] = []
+    # PREPARE DATA FRAME
+    df = pd.DataFrame(data={
+        'EPISODE': [],
+        'STEP': [],
+        **{col: [] for col in action_col_names + observation_col_names},
+    })
 
-    # action columns
-    d.update({action_col: [] for action_col in action_col_names})
-
-    # state/observation columns
-    observation_col_names = []
-    for i in range(0, __get_dimension(observation_space)):
-        observation_name = f'X_{i}'
-        d[observation_name] = []
-        observation_col_names.append(observation_name)
-
-    df = pd.DataFrame(data=d)
-
-    ### SAMPLE DATA
+    # SAMPLE DATA
     for episode in range(episode_count):
-        print("Start of episode %d" % episode)
+        print('Start of episode %d' % episode)
         obs = env.reset()
         step = 0
         done = False
@@ -134,27 +74,26 @@ def __sample_gym_environment(gym_environment_name: str, episode_count=20, max_st
         while step < max_steps and not done:
             step += 1
             action = env.action_space.sample()
+            action_sv = space_value_from_gym(env.action_space, action, SpaceType.ACTION)
+            obs_sv = space_value_from_gym(env.observation_space, obs)
 
             df = df.append({
                 'EPISODE': int(episode),
                 'STEP': int(step),
-                **__map_sampled_action_to_columns(env.action_space, action_config, action),
-                **{observation_col_names[i]: obs[i] for i in range(0, len(observation_col_names))},
+                **action_sv.to_column_dict(),
+                **obs_sv.to_column_dict(),
             }, ignore_index=True)
 
             obs, reward, done, _ = env.step(action)
 
-        print("  --> finished after %d steps" % step)
+        print('  --> finished after %d steps' % step)
 
     df = df.astype({'EPISODE': int, 'STEP': int})
-
-    config = __generate_config_yaml_file(action_col_names, observation_col_names, action_config,
-                                         observation_space, env_name=gym_environment_name)
-
     return df, config
 
 
-def sample_gym_environment(gym_environment_name: str, episode_count=20, max_steps=100, output_path=os.path.join(ROOT_DIR, 'sample_output')):
+def sample_gym_environment(gym_environment_name: str, episode_count=20, max_steps=100,
+                           output_path=os.path.join(ROOT_DIR, 'sample_output')):
     """
     Sample the given gym environment with the given amount of episodes and maximum
     steps per episode.
@@ -173,26 +112,17 @@ def sample_gym_environment(gym_environment_name: str, episode_count=20, max_step
     Returns (path_to_csv_data_file, configuration object)
     """
 
-    df, config = __sample_gym_environment(gym_environment_name, episode_count=20, max_steps=100, output_path=output_path)
+    df, config = __sample_gym_environment(gym_environment_name, episode_count=episode_count,
+                                          max_steps=max_steps)
 
     final_dir_name = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
-
-    env_dir_path = os.path.join(output_path, gym_environment_name)
-    final_dir_path = os.path.join(env_dir_path, final_dir_name)
-    try:
-        os.mkdir(env_dir_path)
-    except FileExistsError:
-        print('There already is a folder for this gym environment')
-    os.mkdir(final_dir_path)
+    final_dir_path = os.path.join(output_path, gym_environment_name, final_dir_name)
+    os.makedirs(final_dir_path)
 
     data_file = f'{final_dir_path}/data.csv'
     df.to_csv(data_file, sep=',', encoding='utf-8', index=False)
+    config.set('input_config.input_file_name', os.path.abspath(data_file))
+    config.save_config(file=f'{final_dir_path}/config.yaml')
 
-    if data_file is not None:
-        config.set('input_config.input_file_name', os.path.abspath(data_file))
-    config_file = f'{final_dir_path}/config.yaml'
-    config.save_config(file=config_file)
-
-    print(f"Data and config saved in: {final_dir_path}")
-
+    print(f'Data and config saved in: {final_dir_path}')
     return data_file, config
