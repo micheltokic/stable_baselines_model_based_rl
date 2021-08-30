@@ -66,7 +66,7 @@ def __build_and_train_dynamic_model(df: pd.DataFrame, config: Configuration, out
     patience = config.get('dynamic_model.training.patience', 15)
     # optimizer.learning_rate.assign(config.get('dynamic_model.training.learning_rate', 0.1))
 
-    artificial_noise = config.get('dynamic_model.utility_flags.artificial_noise', True)
+    artificial_noise = config.get('dynamic_model.utility_flags.artificial_noise', False)
     noise_settings = {}
     if artificial_noise:
         noise_settings = config.get('dynamic_model.validation.noise')
