@@ -60,6 +60,10 @@ class SpaceValue:
     def to_value_list(self):
         return list(self.value)
 
+    def col_amount(self):
+        """Returns the required amount of columns for this space (value)."""
+        return len(self.to_value_list())
+
     @staticmethod
     def generate_default_col_names(type: SpaceType = SpaceType.OBSERVATION,
                                    amount: int = 1) -> List[str]:
