@@ -15,3 +15,5 @@ nav:
     - policy-training.md
   - configuration-file.md
   - ...
+markdown_extensions:
+  - pymdownx.critic

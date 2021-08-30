@@ -1,3 +1,8 @@
 # Create wrapped Gym Environemnt
 
-todo
+
+## Step Handler
+TODO
+
+## Reset Handler
+TODO
