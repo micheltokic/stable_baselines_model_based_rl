@@ -50,10 +50,6 @@ dynamic_model:
             - class_name: LSTM
               config:
                 units: 50
-            - class_name: Dense
-              config:
-                units: 4
-                activation: relu
 
     validation:
         noise:

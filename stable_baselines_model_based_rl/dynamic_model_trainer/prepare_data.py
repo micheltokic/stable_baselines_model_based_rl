@@ -2,9 +2,10 @@ from stable_baselines_model_based_rl.utils.noise import add_fake_noise, add_gaus
 import tensorflow as tf
 import numpy as np
 import pandas as pd
+from keras.layers import Dense, Normalization
 
 
-def prepare_data(df, input_col, target_col, window_size, training_batch_size=10, validation_batch_size=10,
+def prepare_data(df, input_col, target_col, window_size, config, training_batch_size=10, validation_batch_size=10,
                  training_pattern_percent=0.7, noise_settings={}):
     """
     Reads the data of the data frame,
@@ -36,7 +37,7 @@ def prepare_data(df, input_col, target_col, window_size, training_batch_size=10,
         df = add_gaussian_noise(df, target_col, **noise_settings)
 
     ((x_train_multi, y_train_multi), (x_val_multi, y_val_multi)), test_data, mean_in, std_in, mean_out, std_out = \
-        __create_training_data(df, input_col, target_col, window_size=window_size,
+        __create_training_data(df, input_col, target_col, config, window_size=window_size,
                                training_pattern_percent=training_pattern_percent)
 
     print('trainData: Single window of past history : {}'.format(x_train_multi[0].shape))
@@ -56,7 +57,7 @@ def prepare_data(df, input_col, target_col, window_size, training_batch_size=10,
     return train_data, val_data, test_data, input_shape, mean_in, std_in, mean_out, std_out
 
 
-def __create_training_data(data, input_col, target_col, window_size=1, training_pattern_percent=0.7):
+def __create_training_data(data, input_col, target_col, config, window_size=1, training_pattern_percent=0.7):
     data_train = data
 
     mean_in, std_in = __mean_and_std(input_col, data_train)
@@ -80,8 +81,12 @@ def __create_training_data(data, input_col, target_col, window_size=1, training_
     test_data = data_train[:test_split] 
     data_train = data_train.iloc[test_split:]
 
-    data_train = __normalize(data_train, target_col)
+    # Custom Normalization
+    # data_train = __normalize(data_train, target_col, config)
 
+    #layer = Normalization()
+    #train_df = __get_observation_df(data_train, target_col)
+    #layer.adapt(train_df)
 
     # data_train = pd.DataFrame(data_train, columns=columns)
 
@@ -167,13 +172,18 @@ def __multivariate_data(dataset, target, start_index, end_index, history_size,
     return np.array(data), np.array(labels)
 
 
-def __normalize(df, columns):
+def __normalize(df, columns, config):
     result = df.copy()
+    normalization_info = {}
     for feature_name in columns:
-        # max_value = df[feature_name].max()
-        # min_value = df[feature_name].min()
-        # result[feature_name] = (df[feature_name] - min_value) / (max_value - min_value)
+        avg = np.average(df[feature_name])
+        std = np.std(df[feature_name])
+        normalization_info[feature_name] = (avg, std)
+        result[feature_name] = (df[feature_name] - avg) / std
 
-        result[feature_name] = (df[feature_name] - np.average(df[feature_name])) / (np.std(df[feature_name]))
-
+    config.set("normalization", normalization_info)
     return result
+
+
+def __get_observation_df(df, columns):
+    return df[columns]

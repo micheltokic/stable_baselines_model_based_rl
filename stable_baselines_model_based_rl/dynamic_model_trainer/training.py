@@ -83,7 +83,7 @@ def __build_and_train_dynamic_model(df: pd.DataFrame, config: Configuration, out
         prepare_data.prepare_data(df, input_col_names, target_col_names,
                                   window_size=lag,
                                   training_pattern_percent=train_test_ration,
-                                  noise_settings=noise_settings)
+                                  noise_settings=noise_settings, config=config)
 
     callbacks = [keras.callbacks.EarlyStopping(monitor="loss", patience=patience, restore_best_weights=True,
                                                verbose=True)]
@@ -94,9 +94,9 @@ def __build_and_train_dynamic_model(df: pd.DataFrame, config: Configuration, out
                                                          verbose=1, save_best_only=True, mode=min))
         callbacks.append(keras.callbacks.TensorBoard(log_dir=".\model_logs_tb", histogram_freq=1))
 
-    print(config.get('dynamic_model.keras_model.config.layers'))
-    config.get('dynamic_model.keras_model.config.layers')[0]['batch_input_shape'] = input_shape
-    model = model_builder.build_dynamic_model(config.get('dynamic_model.keras_model'), len(target_col_names),
+    model = model_builder.build_dynamic_model(config.get('dynamic_model.keras_model'), input_shape, mean_in, std_in,
+                                              mean_out,
+                                              std_out, len(target_col_names),
                                               optimizer, loss)
 
     history = model.fit(train_data, epochs=max_epochs, steps_per_epoch=steps_per_epoch,
@@ -109,7 +109,8 @@ def __build_and_train_dynamic_model(df: pd.DataFrame, config: Configuration, out
     if config.get('dynamic_model.utility_flags.evaluate_model'):
         dfNet, dfEval = verifier.evaluate_model(model, df, input_col_names, action_col_names, target_col_names,
                                                 lag)
-        dfDiff = verifier.evaluate_model_with_test_data(model, test_data, input_col_names, action_col_names, target_col_names)
+        dfDiff = verifier.evaluate_model_with_test_data(model, test_data, input_col_names, action_col_names,
+                                                        target_col_names)
         if config.get('dynamic_model.utility_flags.plot_results'):
             fig = verifier.plot_results(input_col_names, action_col_names, dfNet, dfEval, dfDiff, lag, mean_in, std_in)
 
