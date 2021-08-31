@@ -75,6 +75,12 @@ model_wrapping:
     done:
         type: CONSTANT  # one of CONSTANT, EVAL, or HANDLER
         value: 200
+    reset:
+        type: RANDOM  # one of RANDOM, STATIC, EPISODE_START, or HANDLER
+        value:
+            buffer: null
+            current_state: null
+        data_file: null
 
 #
 # Policy Configuration

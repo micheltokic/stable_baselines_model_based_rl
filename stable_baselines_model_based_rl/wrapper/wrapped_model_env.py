@@ -1,4 +1,5 @@
 import collections
+from stable_baselines_model_based_rl.wrapper.reset_handler import ResetHandler
 from typing import Any, Tuple
 
 import gym
@@ -25,6 +26,7 @@ class WrappedModelEnv(gym.Env):
 
     config: Configuration = None
     step_handler: StepRewardDoneHandler = None
+    reset_handler: ResetHandler = None
     action_type = None
     model = None
     window_size = None
@@ -36,15 +38,21 @@ class WrappedModelEnv(gym.Env):
     obs_space_internal_cls = None
     action_cols = None
     observation_cols = None
-    
+
     def __init__(self, model_path, config: Configuration,
-                 step_handler: StepRewardDoneHandler = None, window_size=None):
+                 step_handler: StepRewardDoneHandler = None, reset_handler: ResetHandler = None,
+                 window_size=None):
         super().__init__()
         self.config = config
         self.step_handler = (step_handler if step_handler is not None
                              else StepRewardDoneHandler(config))
         assert isinstance(self.step_handler, StepRewardDoneHandler), \
-            f'Invalid class/object given as rewardhandler! {type(self.step_handler).__name__}'
+            f'Invalid class/object given as step_handler! {type(self.step_handler).__name__}'
+        self.reset_handler = (reset_handler if reset_handler is not None
+                              else ResetHandler(config))
+        assert isinstance(self.reset_handler, ResetHandler), \
+            f'Invalid class/object given as reset_handler! {type(self.reset_handler).__name__}'
+
         self.action_type = config.get('input_config.action_type')
         assert self.action_type in ['DISCRETE', 'MULTI_DISCRETE', 'BOX'], \
             f'Unsupported action type ({self.action_type}) in configuration file (input config)!'
@@ -97,9 +105,6 @@ class WrappedModelEnv(gym.Env):
         return self.current_state, reward, done, None
 
     def reset(self):
-        # TODO: More configuration possibilities for reset (e.g., normal
-        #       distribution, default values, etc.)
-        
         self.step_handler.observation = None
         self.step_handler.action = None
         self.step_handler.observation_history = []
@@ -107,15 +112,26 @@ class WrappedModelEnv(gym.Env):
 
         self.state_buffer.clear()
 
-        # fill buffer (last entry will added in step, before using the net for prediction)
-        for i in range(self.window_size - 1):
-            action = space_value_from_gym(self.action_space, self.action_space.sample(),
-                                          SpaceType.ACTION)
-            observation = self.observation_space.sample()
-            self.state_buffer.append(np.float64([*action.to_value_list(), *observation]))
-        
+        expected_current_state_length = space_value_from_gym(
+            self.observation_space, self.observation_space.sample()).col_amount()
+        expected_buf_item_length = expected_current_state_length + space_value_from_gym(
+            self.action_space, self.action_space.sample()).col_amount()
+
+        buffer, cur_state = self.reset_handler.generate_reset_observation(self.action_space,
+                                                                          self.observation_space,
+                                                                          self.window_size)
+        assert len(buffer) == self.window_size - 1, \
+            'Reset Handler generated buffer with incompatible size!'
+        assert len(cur_state) == expected_current_state_length, \
+            'Reset Handler generated invalid current state (incompatible length)!'
+
+        for buf_item in buffer:
+            assert len(buf_item) == expected_buf_item_length, \
+                'Reset Handler generated buffer with at least one incompatible item!'
+            self.state_buffer.append(np.float64(buf_item))
+        self.current_state = np.float64(cur_state)
         self.steps = 0
-        self.current_state = np.float64(self.observation_space.sample())
+
         return self.current_state
 
 
