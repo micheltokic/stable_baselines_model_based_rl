@@ -29,7 +29,6 @@ def build_dynamic_model(model_config, input_shape, mean_in, std_in, mean_out, st
     # layer for correct output shape
     dynamic_model.add(Dense(output_len))
     # revert normalization layer (last layer)
-    print(mean_in, mean_out, std_in, std_out)
     dynamic_model.add(Lambda(lambda x, mean, std: tf.add(tf.multiply(x, std), mean),
                              arguments={'mean': mean_out, 'std': std_out}))
 
