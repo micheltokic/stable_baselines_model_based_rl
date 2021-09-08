@@ -1,7 +1,7 @@
 import yaml
 import keras
-from keras.layers import Dense, Normalization
-from keras.models import Sequential, Model
+from keras.layers import Dense, Lambda
+from keras.models import Sequential
 import tensorflow as tf
 
 
@@ -20,16 +20,18 @@ def build_dynamic_model(model_config, input_shape, mean_in, std_in, mean_out, st
     """
 
     yaml_model_config = yaml.dump(model_config)
-    dynamic_model = keras.models.model_from_yaml(yaml_model_config, custom_objects=None)
-    layers = dynamic_model.layers
+    dynamic_model: Sequential = keras.models.model_from_yaml(yaml_model_config, custom_objects=None)
 
-    dynamic_model = Sequential()
-    dynamic_model.add(tf.keras.layers.Lambda(lambda x: (x - mean_in) / std_in, input_shape=input_shape))
-
-    for layer in layers:
-        dynamic_model.add(layer)
-
+    # normalization layer (first layer)
+    dynamic_model.layers.insert(0, Lambda(lambda x, mean, std: tf.divide(tf.subtract(x, mean), std),
+                                          input_shape=input_shape,
+                                          arguments={'mean': mean_in, 'std': std_in}))
+    # layer for correct output shape
     dynamic_model.add(Dense(output_len))
+    # revert normalization layer (last layer)
+    print(mean_in, mean_out, std_in, std_out)
+    dynamic_model.add(Lambda(lambda x, mean, std: tf.add(tf.multiply(x, std), mean),
+                             arguments={'mean': mean_out, 'std': std_out}))
 
     def loss(y_true, y_pred):
         y_true_n = tf.divide(tf.subtract(y_true, mean_out), std_out)
