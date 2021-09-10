@@ -23,13 +23,13 @@ def build_dynamic_model(model_config, input_shape, mean_in, std_in, mean_out, st
     dynamic_model: Sequential = keras.models.model_from_yaml(yaml_model_config, custom_objects=None)
 
     # normalization layer (first layer)
-    dynamic_model.layers.insert(0, Lambda(lambda x, mean, std: tf.divide(tf.subtract(x, mean), std),
+    dynamic_model.layers.insert(0, Lambda(lambda x, mean, std: (x - mean) / std,
                                           input_shape=input_shape,
                                           arguments={'mean': mean_in, 'std': std_in}))
     # layer for correct output shape
     dynamic_model.add(Dense(output_len))
     # revert normalization layer (last layer)
-    dynamic_model.add(Lambda(lambda x, mean, std: tf.add(tf.multiply(x, std), mean),
+    dynamic_model.add(Lambda(lambda x, mean, std: (x * std) + mean,
                              arguments={'mean': mean_out, 'std': std_out}))
 
     def loss(y_true, y_pred):
