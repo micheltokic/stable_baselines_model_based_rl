@@ -41,3 +41,7 @@ lazydocs \
 This will generate the api docs for the entire stable_baslines_model_based_rl
 module and also create an overview page containing links to all packages, modules,
 functions, etc.
+
+### Automatic Docs Generation & GitHub Pages
+The GitHub Workflow (`docs`) automatically generates the API docs, builds the MkDocs
+and "deploys" it to the gh-pages branch, which means it'll be deployed to GitHub Pages

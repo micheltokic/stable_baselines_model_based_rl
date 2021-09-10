@@ -1,0 +1,22 @@
+name: docs
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.x
+      - run: pip install -r requirements.txt
+      - run: |
+          lazydocs \
+            --overview-file="README.md" \
+            --output-path="./docs/api" \
+            --src-base-url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/blob/main/" \
+            ./stable_baselines_model_based_rl
+      - run: mkdocs gh-deploy --force
