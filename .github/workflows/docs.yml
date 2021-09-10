@@ -19,4 +19,5 @@ jobs:
             --output-path="./docs/api" \
             --src-base-url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/blob/main/" \
             ./stable_baselines_model_based_rl
+      - run: git config user.name "GitHub Actions Bot"
       - run: mkdocs gh-deploy --force
