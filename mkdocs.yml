@@ -4,8 +4,14 @@ theme:
   features:
     - navigation.expand
 plugins:
-  - search
   - awesome-pages
+  - search
+  - with-pdf:
+      author: 'LMU Munich'
+      cover_subtitle: Documentation
+      copyright: 'Apache 2.0 License'
+      output_path: ./stable-baselines-model-based-rl-DOCS.pdf
+      enabled_if_env: DOCS_PDF_EXPORT
 nav:
   - index.md
   - 'Using the Framework':

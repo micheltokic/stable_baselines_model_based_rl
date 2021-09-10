@@ -45,3 +45,14 @@ functions, etc.
 ### Automatic Docs Generation & GitHub Pages
 The GitHub Workflow (`docs`) automatically generates the API docs, builds the MkDocs
 and "deploys" it to the gh-pages branch, which means it'll be deployed to GitHub Pages
+
+### PDF Generation
+To export the documentation as PDF file, first follow all requirement instructions
+as described here: https://github.com/orzih/mkdocs-with-pdf#requirements.  
+The PDF file will only be created if a specific environment variable
+(`DOCS_PDF_EXPORT`) is set:  
+```shell
+export DOCS_PDF_EXPORT=1
+mkdocs build
+```
+The generated PDF file is located in the `site` directory.
