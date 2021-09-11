@@ -1,26 +1,19 @@
-from stable_baselines_model_based_rl.dynamic_model_trainer import training
 import os
+
 from definitions import ROOT_DIR, gym_simple_control_environment_names
+from stable_baselines_model_based_rl.dynamic_model_trainer import training
+from stable_baselines_model_based_rl.sampler.gym_sampler import sample_gym_environment
 
 
-def sample_env_and_train(gym_environment_name, episode_count=200, max_steps=100, output_path=None):
-    if output_path is None:
-        output_path = os.path.join(ROOT_DIR, 'sample_output')
-        output_path = os.path.join(output_path, gym_environment_name)
-        try:
-            os.mkdir(output_path)
-        except PermissionError:
-            print(f'Permission Error: folder {output_path} could not be created')
-        except FileExistsError:
-            print(f'FileExists Error: folder {output_path} already exists')
-        except:
-            print(f'Error: folder {output_path} could not be created ')
+def sample_env_and_train(gym_environment_name, episode_count=300, max_steps=500, debug=True):
+    output_path_sampling = os.path.join(ROOT_DIR, 'sample_output')
+    output_path_model = os.path.join(ROOT_DIR, 'sample_output',
+                                     gym_environment_name, 'dynamic_models')
 
-    training.sample_environment_and_train_dynamic_model(gym_environment_name, episode_count, max_steps, output_path)
-
+    data, config = sample_gym_environment(gym_environment_name, episode_count,
+                                          max_steps, output_path_sampling)
+    training.build_and_train_dynamic_model(data, config, output_path_model, debug)
 
 if __name__ == '__main__':
-    # envs.registry.all()
-
     for name in gym_simple_control_environment_names:
-        sample_env_and_train(name)
+        sample_env_and_train(name, 10, 100)

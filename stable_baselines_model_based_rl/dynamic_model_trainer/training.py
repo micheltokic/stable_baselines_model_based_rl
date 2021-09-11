@@ -1,5 +1,4 @@
 import os
-from copy import deepcopy
 from datetime import datetime
 
 import keras
@@ -12,45 +11,32 @@ from stable_baselines_model_based_rl.utils.configuration import Configuration
 import stable_baselines_model_based_rl.sampler.gym_sampler as sampler
 
 
-def sample_environment_and_train_dynamic_model(gym_environment_name, episode_count, max_steps, output_path):
+def build_and_train_dynamic_model(data_path, config: Configuration, output_path=ROOT_DIR,
+                                  debug: bool = False):
     """
-    Sampling data from a given gym environment and building and training a dynamic model for a given csv dataset retrieved from a
-    csv dataset retrieved from a gym environment based on configurations specified in a yaml file.
-
-    Args:
-        gym_environment_name: Name of the gym environment from which data is sampled
-        episode_count: Number of episodes to be sampled for the dataset
-        max_steps: Maximum number of steps in an episode
-
-    Returns:
-        lstm_model: The lstm model trained on the given dataset
-    """
-
-    df, config = sampler.__sample_gym_environment(gym_environment_name, episode_count, max_steps)
-    return __build_and_train_dynamic_model(df, config, output_path)
-
-
-def build_and_train_dynamic_model(data_path, config: Configuration, output_path=ROOT_DIR):
-    """
-    Builds and trains a dynamic model for a given csv dataset retrieved from a gym environment based on configurations
-    specified in a yaml file
+    Builds and trains a dynamic model for a given csv dataset retrieved from a gym environment
+    based on configurations specified in a yaml file
 
     Args:
         data_path: Name of the data file
         config: Configuration Object that contains the given yaml Configuration
         output_path: Directory path of training output
+        debug: Flag to enable additional debug features, such as renaming the directory of the
+            resulting model based on the used lag value and the resulted loss.
 
     Returns:
         model: The model trained on the given dataset
+        output_path: The path were everything has been stored
 
     Todo:
-    * evaluation, plotting configuration into yaml file?
+        evaluation, plotting configuration into yaml file?
     """
     df = pd.read_csv(data_path)
-    return __build_and_train_dynamic_model(df, config, output_path)
+    return __build_and_train_dynamic_model(df, config, output_path, debug)
 
 
-def __build_and_train_dynamic_model(df: pd.DataFrame, config: Configuration, output_path=ROOT_DIR):
+def __build_and_train_dynamic_model(df: pd.DataFrame, config: Configuration, path=ROOT_DIR,
+                                    debug: bool = False):
     target_col_names = config.get('input_config.observation_cols')
     action_col_names = config.get('input_config.action_cols')
     input_col_names = action_col_names + target_col_names
@@ -67,17 +53,11 @@ def __build_and_train_dynamic_model(df: pd.DataFrame, config: Configuration, out
     # optimizer.learning_rate.assign(config.get('dynamic_model.training.learning_rate', 0.1))
 
     artificial_noise = config.get('dynamic_model.utility_flags.artificial_noise', False)
-    noise_settings = {}
-    if artificial_noise:
-        noise_settings = config.get('dynamic_model.validation.noise')
+    noise_settings = config.get('dynamic_model.validation.noise') if artificial_noise else {}
 
     final_dir_name = datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
-    output_path = os.path.join(output_path, final_dir_name)
-    try:
-        os.mkdir(output_path)
-        print("Created Folder: ", output_path)
-    except:
-        print("folder already exists")
+    output_path = os.path.join(path, final_dir_name)
+    os.makedirs(output_path, exist_ok=True)
 
     train_data, val_data, test_data, input_shape, mean_in, std_in, mean_out, std_out = \
         prepare_data.prepare_data(df, input_col_names, target_col_names,
@@ -85,19 +65,24 @@ def __build_and_train_dynamic_model(df: pd.DataFrame, config: Configuration, out
                                   training_pattern_percent=train_test_ration,
                                   noise_settings=noise_settings, config=config)
 
-    callbacks = [keras.callbacks.EarlyStopping(monitor="loss", patience=patience, restore_best_weights=True,
-                                               verbose=True)]
+    callbacks = [keras.callbacks.EarlyStopping(monitor="loss", patience=patience,
+                                               restore_best_weights=True, verbose=True)]
     if config.get('dynamic_model.utility_flags.log_training'):
-        callbacks.append(keras.callbacks.ModelCheckpoint(filepath=f"{output_path}/model.bestTrainLoss", monitor='loss',
-                                                         verbose=1, save_best_only=True, mode=min))
-        callbacks.append(keras.callbacks.ModelCheckpoint(filepath=f"{output_path}/bestValLoss", monitor='val_loss',
-                                                         verbose=1, save_best_only=True, mode=min))
-        callbacks.append(keras.callbacks.TensorBoard(log_dir=".\model_logs_tb", histogram_freq=1))
+        callbacks.append(
+            keras.callbacks.ModelCheckpoint(filepath=f"{output_path}/model.bestTrainLoss",
+                                            monitor='loss', verbose=1, save_best_only=True,
+                                            mode=min))
+        callbacks.append(
+            keras.callbacks.ModelCheckpoint(filepath=f'{output_path}/model.bestValLoss',
+                                            monitor='val_loss', verbose=1, save_best_only=True,
+                                            mode=min))
+        callbacks.append(
+            keras.callbacks.TensorBoard(log_dir=f'{output_path}/model.tensorboard_logs',
+                                        histogram_freq=1))
 
-    model = model_builder.build_dynamic_model(config.get('dynamic_model.keras_model'), input_shape, mean_in, std_in,
-                                              mean_out,
-                                              std_out, len(target_col_names),
-                                              optimizer, loss)
+    model = model_builder.build_dynamic_model(config.get('dynamic_model.keras_model'), input_shape,
+                                              mean_in, std_in, mean_out, std_out,
+                                              len(target_col_names), optimizer, loss)
 
     history = model.fit(train_data, epochs=max_epochs, steps_per_epoch=steps_per_epoch,
                         validation_data=val_data, validation_steps=validation_steps,
@@ -107,15 +92,28 @@ def __build_and_train_dynamic_model(df: pd.DataFrame, config: Configuration, out
     model.summary()
 
     if config.get('dynamic_model.utility_flags.evaluate_model'):
-        dfNet, dfEval = verifier.evaluate_model(model, df, input_col_names, action_col_names, target_col_names,
-                                                lag)
-        dfDiff = verifier.evaluate_model_with_test_data(model, test_data, input_col_names, action_col_names,
-                                                        target_col_names)
+        dfNet, dfEval = verifier.evaluate_model(model, df, input_col_names, action_col_names,
+                                                target_col_names, lag)
+        dfDiff = verifier.evaluate_model_with_test_data(model, test_data, input_col_names,
+                                                        action_col_names, target_col_names)
+        fig = None
         if config.get('dynamic_model.utility_flags.plot_results'):
-            fig = verifier.plot_results(input_col_names, action_col_names, dfNet, dfEval, dfDiff, lag, mean_in, std_in)
-
-            if config.get('dynamic_model.utility_flags.save'):
-                verifier.save(output_path, model, history.history['val_loss'][len(history.history['val_loss']) - 1],
-                              lag, fig, config, df)
-
-    return model
+            fig = verifier.plot_results(input_col_names, action_col_names, dfNet, dfEval,
+                                        dfDiff, lag, mean_in, std_in, debug)
+        if config.get('dynamic_model.utility_flags.save'):
+            verifier.save(output_path, model, fig, config, df)
+    
+    if debug:
+        rounded_lag = "{:.2f}".format(round(lag, 4))
+        last_loss = history.history['val_loss'][len(history.history['val_loss']) - 1]
+        new_folder_name = f'{final_dir_name}_loss={last_loss}_lag={rounded_lag}'
+        new_dir_path = os.path.join(path, new_folder_name)
+        try:
+            os.rename(output_path, new_dir_path)
+            output_path = new_dir_path
+        except PermissionError:
+            print(f'Permission Error: folder {output_path} could not be renamed'
+                  f'to {new_dir_path}')
+    
+    print(f'Output saved to: {output_path}')
+    return model, output_path
