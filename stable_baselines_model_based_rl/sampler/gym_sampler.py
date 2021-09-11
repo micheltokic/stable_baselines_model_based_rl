@@ -123,6 +123,7 @@ def sample_gym_environment(gym_environment_name: str, episode_count=20, max_step
     df.to_csv(data_file, sep=',', encoding='utf-8', index=False)
     config.set('input_config.input_file_name', os.path.abspath(data_file))
     config.set('model_wrapping.reset.data_file', os.path.abspath(data_file))
+    config.set('model_wrapping.reset.type', 'EPISODE_START')
     config.save_config(file=f'{final_dir_path}/config.yaml')
 
     print(f'Data and config saved in: {final_dir_path}')
