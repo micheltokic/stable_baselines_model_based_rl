@@ -109,7 +109,7 @@ class WrappedModelEnv(gym.Env):
         reward = self.step_handler.get_reward(self.steps)
         done = self.step_handler.get_done(self.steps)
 
-        return self.current_state, reward, done, None
+        return self.current_state, reward, done, {}
 
     def reset(self):
         self.step_handler.observation = None
