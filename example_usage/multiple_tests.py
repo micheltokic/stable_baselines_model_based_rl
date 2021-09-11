@@ -1,6 +1,7 @@
 import os
-from dynamic_model_trainer.training import __build_and_train_dynamic_model
-from sampler.gym_sampler import __sample_gym_environment
+from stable_baselines_model_based_rl.dynamic_model_trainer.training import \
+    __build_and_train_dynamic_model
+from stable_baselines_model_based_rl.sampler.gym_sampler import __sample_gym_environment
 
 from definitions import ROOT_DIR, gym_simple_control_environment_names
 
@@ -13,16 +14,8 @@ if __name__ == '__main__':
     max_steps = 100
 
     for name in names:
-        output_path = os.path.join(ROOT_DIR, 'sample_output')
-        output_path = os.path.join(output_path, name)
-        try:
-            os.mkdir(output_path)
-        except PermissionError:
-            print(f'Permission Error: folder {output_path} could not be created')
-        except FileExistsError:
-            print(f'FileExists Error: folder {output_path} already exists')
-        except:
-            print(f'Error: folder {output_path} could not be created ')
+        output_path = os.path.join(ROOT_DIR, 'sample_output', name)
+        os.makedirs(output_path, exist_ok=True)
 
         learning_rates = [(0.00001 * (10 ** i)) for i in range(1, 5)]
         batch_sizes = [(2 ** i) for i in range(3, 9)]
