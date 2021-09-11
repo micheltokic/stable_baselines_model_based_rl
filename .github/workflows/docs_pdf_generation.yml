@@ -1,0 +1,30 @@
+name: docs_pdf_generation
+on:
+  workflow_dispatch:
+
+jobs:
+  generate_pdf:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.x
+      - run: |
+          sudo apt-get install python3-cffi python3-brotli libpango-1.0-0 libharfbuzz0b libpangoft2-1.0-0
+          pip install -r requirements.txt
+          pip install weasyprint
+          weasyprint --info
+      - run: |
+          lazydocs \
+            --overview-file="README.md" \
+            --output-path="./docs/api" \
+            --src-base-url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/blob/main/" \
+            ./stable_baselines_model_based_rl
+          export DOCS_PDF_EXPORT=1
+          mkdocs build
+      - uses: actions/upload-artifact@v2
+        with:
+          name: docs_pdf
+          path: site/stable-baselines-model-based-rl-DOCS.pdf
+          if-no-files-found: error
