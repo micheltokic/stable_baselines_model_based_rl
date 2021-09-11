@@ -10,7 +10,7 @@ from gym.spaces.discrete import Discrete
 from gym.spaces.space import Space
 
 from stable_baselines_model_based_rl.utils.configuration import Configuration
-from stable_baselines_model_based_rl.utils.spaces.base import SpaceType, generate_gym_box_space
+from stable_baselines_model_based_rl.utils.spaces.base import SpaceType, SpaceValue, generate_gym_box_space
 from stable_baselines_model_based_rl.utils.spaces.box import BoxSpaceValue
 from stable_baselines_model_based_rl.utils.spaces.discrete import DiscreteSpaceValue
 from stable_baselines_model_based_rl.utils.spaces.factory import space_value_from_gym
@@ -38,6 +38,11 @@ class WrappedModelEnv(gym.Env):
     obs_space_internal_cls = None
     action_cols = None
     observation_cols = None
+
+    # flag to control, whether the step function expects the internal action format,
+    # e.g., a list for distinct actions, or the gym format (one int in case of distinct
+    # actions).
+    use_internal_action_format = False
 
     def __init__(self, model_path, config: Configuration,
                  step_handler: StepRewardDoneHandler = None, reset_handler: ResetHandler = None,
@@ -76,9 +81,11 @@ class WrappedModelEnv(gym.Env):
 
         self.steps += 1
 
-        # TODO: support different formats of actions; either:
-        #         - like the columns of the CSV file
-        #         - like the gym space (differes only for discrete actions)
+        # Map action input to internal format if gym format is given
+        if not self.use_internal_action_format:
+            mapped_action: SpaceValue = self.action_space_internal_cls.from_gym_space(
+                self.action_space, action, SpaceType.ACTION, self.action_cols)
+            action = mapped_action.to_value_list()
 
         net_input = [*action, *self.current_state]
         self.state_buffer.append(np.float64(net_input))
