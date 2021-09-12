@@ -33,6 +33,7 @@ class WrappedModelEnv(gym.Env):
     state_buffer = None
     steps = 0
     current_state = None
+    steps_over_done = None
 
     action_space_internal_cls = None
     obs_space_internal_cls = None
@@ -109,6 +110,13 @@ class WrappedModelEnv(gym.Env):
         reward = self.step_handler.get_reward(self.steps)
         done = self.step_handler.get_done(self.steps)
 
+        if done and self.steps_over_done is None:
+            self.steps_over_done = 0
+        elif self.steps_over_done is not None:
+            self.steps_over_done += 1
+            print('ALERT! Called step() even though episode is already done! '
+                  f'{self.steps_over_done} steps over done! Behaviour is undefined!')
+
         return self.current_state, reward, done, {}
 
     def reset(self):
@@ -116,6 +124,7 @@ class WrappedModelEnv(gym.Env):
         self.step_handler.action = None
         self.step_handler.observation_history = []
         self.step_handler.action_history = []
+        self.steps_over_done = None
 
         self.state_buffer.clear()
 
