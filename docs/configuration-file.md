@@ -266,6 +266,7 @@ model_wrapping:
 The `sb_policy` section defines the parameters for the policy training with stable baselines
 against the (wrapped) gym environment.  
 You have three configuration options here:
+
 - `reinforcement_learning_algorithm`: The Algorithm to use for the model (e.g., PPO).
 - `policy`: The policy to use (e.g., MlpPolicy).
 - `timesteps`: Timesteps for the training/learning.
