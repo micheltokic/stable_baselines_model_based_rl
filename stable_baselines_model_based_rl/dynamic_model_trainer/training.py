@@ -55,6 +55,7 @@ def __build_and_train_dynamic_model(df: pd.DataFrame, config: Configuration, pat
     artificial_noise = config.get('dynamic_model.utility_flags.artificial_noise', False)
     noise_settings = config.get('dynamic_model.validation.noise') if artificial_noise else {}
 
+    path = os.path.join(path, 'dynamic_models')
     final_dir_name = datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
     output_path = os.path.join(path, final_dir_name)
     os.makedirs(output_path, exist_ok=True)
