@@ -83,7 +83,9 @@ model_wrapping:
         data_file: null
 
 #
-# Policy Configuration
+# Stable Baselines Policy Configuration
 #
-policy:
+sb_policy:
     reinforcement_learning_algorithm: 'PPO'
+    policy: 'MlpPolicy'
+    timesteps: 10000

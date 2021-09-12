@@ -14,5 +14,7 @@ distinct tasks, namely:
   model in a gym environemtn with proper action and oberservation space. You
   only need to define a few details about your input data 
 - **Train Policy with Stable Baselines**. Use any stable baselines algorithm to
-  to train a poliy agains the wrapped gym environment. You only have to specify
+  to train a poliy against the wrapped gym environment. You only have to specify
   some kind of reward function.
+
+Depending on your use-case, you may only use some specific parts of the library.
