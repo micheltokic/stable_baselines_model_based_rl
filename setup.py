@@ -13,5 +13,12 @@ setup(
         'stable-baselines3[extra]==1.0',
         'tensorflow~=2.5.0',
         'matplotlib~=3.4.2',
+        'click~=7.1.2',
     ],
+    entry_points={
+        'console_scripts': [
+            'sb-mbrl = stable_baselines_model_based_rl.cli.sb_mbrl:sb_mbrl',
+            'sb-mbrl-obtain-config-file = stable_baselines_model_based_rl.cli.sb_mbrl_obtain_config_file:obtain_config_file',
+        ],
+    },
 )

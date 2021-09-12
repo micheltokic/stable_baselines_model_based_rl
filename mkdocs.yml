@@ -20,6 +20,7 @@ nav:
     - environment-wrapping.md
     - policy-training.md
   - configuration-file.md
+  - cli.md
   - ...
 markdown_extensions:
   - pymdownx.critic

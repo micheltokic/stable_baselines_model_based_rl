@@ -14,7 +14,13 @@ A template/ example configuration file can be [viewed here](https://github.com/m
 
 
 ## Gym Environment Sampling
-todo
+```yaml
+gym_sampling:
+    gym_environment_name: 'CartPole-v1'
+```
+
+This setting is only used by the CLI for sampling a gym environment and only in the case, that you
+do not specify another environemnt to sample.
 
 
 ## Input Data Configuration
