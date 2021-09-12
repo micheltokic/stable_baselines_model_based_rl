@@ -27,6 +27,7 @@ def build_and_train_dynamic_model(data_path, config: Configuration, output_path=
     Returns:
         model: The model trained on the given dataset
         output_path: The path were everything has been stored
+        model_file_path: The path to the exported model file (None, if it shouldn't be exported)
 
     Todo:
         evaluation, plotting configuration into yaml file?
@@ -92,17 +93,18 @@ def __build_and_train_dynamic_model(df: pd.DataFrame, config: Configuration, pat
 
     model.summary()
 
+    fig = None
     if config.get('dynamic_model.utility_flags.evaluate_model'):
         dfNet, dfEval = verifier.evaluate_model(model, df, input_col_names, action_col_names,
                                                 target_col_names, lag)
         dfDiff = verifier.evaluate_model_with_test_data(model, test_data, input_col_names,
                                                         action_col_names, target_col_names)
-        fig = None
         if config.get('dynamic_model.utility_flags.plot_results'):
             fig = verifier.plot_results(input_col_names, action_col_names, dfNet, dfEval,
                                         dfDiff, lag, mean_in, std_in, debug)
-        if config.get('dynamic_model.utility_flags.save'):
-            verifier.save(output_path, model, fig, config, df)
+    model_file_path = None
+    if config.get('dynamic_model.utility_flags.save'):
+        model_file_path, _ = verifier.save(output_path, model, fig, config, df, debug)
     
     if debug:
         rounded_lag = "{:.2f}".format(round(lag, 4))
@@ -117,4 +119,4 @@ def __build_and_train_dynamic_model(df: pd.DataFrame, config: Configuration, pat
                   f'to {new_dir_path}')
     
     print(f'Output saved to: {output_path}')
-    return model, output_path
+    return model, output_path, model_file_path

@@ -141,12 +141,19 @@ def plot_results(input_col_names, action_col_names, dfNet, dfEval, dfDiff,
     return fig
 
 
-def save(final_dir_path, model, fig, config, df):
-    df.to_csv(os.path.join(final_dir_path, 'data.csv'), sep=',', encoding='utf-8', index=False)
-    config.save_config(file=os.path.join(final_dir_path, 'config.yaml'))
+def save(final_dir_path, model, fig, config, df, debug):
+    # store input data in debug mode in model output folder as well
+    if debug:
+        df.to_csv(os.path.join(final_dir_path, 'data.csv'), sep=',', encoding='utf-8', index=False)
+        config.save_config(file=os.path.join(final_dir_path, 'config.yaml'))
 
+    model_path = f'{final_dir_path}/model.h5'
     if config.get('dynamic_model.utility_flags.export_model'):
-        model.save(f'{final_dir_path}/model.h5')
+        model.save(model_path)
 
+    fig_path = None
     if fig is not None:
-        fig.savefig(f'{final_dir_path}/plot.png')
+        fig_path = f'{final_dir_path}/plot.png'
+        fig.savefig(fig_path)
+
+    return model_path, fig_path
