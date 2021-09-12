@@ -56,3 +56,6 @@ export DOCS_PDF_EXPORT=1
 mkdocs build
 ```
 The generated PDF file is located in the `site` directory.
+
+The manual GitHub Actions workflow `docs_pdf_generation` can be triggered to create the PDF version
+of the documentation. After the job finished, the PDF is availalble as job artifact.

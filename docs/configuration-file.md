@@ -199,7 +199,7 @@ model_wrapping:
 ```
 
 ### Reset Configuration
-For different types of Reset-Handling exist: Random-, Static-, Episode-Start-,
+Four different types of Reset-Handling exist: Random-, Static-, Episode-Start-,
 and Handler-Handling.
 
 #### Random Reset-Handling
