@@ -7,8 +7,10 @@
 import os
 
 import gym
-from stable_baselines_model_based_rl.sb_training.stable_baselines_poliy_trainer import train_stable_baselines_policy
+
 from definitions import ROOT_DIR
+from stable_baselines_model_based_rl.sb_training.stable_baselines_poliy_trainer import \
+    train_stable_baselines_policy
 from stable_baselines_model_based_rl.utils.configuration import Configuration
 
 gym_name = 'CartPole-v1'
