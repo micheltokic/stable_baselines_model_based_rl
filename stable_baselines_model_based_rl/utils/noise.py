@@ -3,37 +3,23 @@ import numpy as np
 from numpy.core.arrayprint import DatetimeFormat
 
 
-def add_fake_noise(data, observation_columns, noise):
+def add_gaussian_noise(data, columns, calc_mean=True, std=0, percentage=0.5):
     """
-    Returns the dimension of a given gym (action/ observation)
-    space.
+    Adds artificial gaussian noise to the data set in the given columns.
+
+    Args:
+        data: Dataset
+        columns: Columns that are altered
+        calc_mean: Specify if the generated noise should be based off of the mean value of a column or each column value on its own
+        std: Standard deviation
+        percentage: specifies how much of the data is modified by an artificial noise
+
+    Returns:
+        data: The noisy dataset
     """
-    noisy_data = data
-
-    # pick random indices of the data to apply noise on
-    # index amount max is half the data size
-    amount = random.randint(0, int(len(noisy_data) / 2))
-    indices = random.sample(range(0, len(noisy_data)), amount)
-    for index in range(len(indices)):
-
-        # pick random indices of the observation columns to apply noise on
-        obs_amount = random.randint(0, len(observation_columns))
-        obs_col_indices = random.sample(range(0, len(observation_columns)), obs_amount)
-        for obs_col_index in range(len(obs_col_indices)):
-            obs_col = observation_columns[obs_col_index]
-
-            # alter value here
-            if random.random() > 0.5:
-                noisy_data[obs_col][index] += noise
-            else:
-                noisy_data[obs_col][index] -= noise
-
-    return noisy_data
-
-def add_gaussian_noise(data, observation_columns, calc_mean=True, std=0, percentage=0.5):
     # always apply noise in the same rows (= noise_indices) on all observations
     noise_indices = random.sample(range(1, len(data)), int(len(data)*percentage))
-    for col in observation_columns:
+    for col in columns:
         if calc_mean:
             col_mean = data[col].mean()
             noise = np.random.normal(col_mean, std, data[col].shape)

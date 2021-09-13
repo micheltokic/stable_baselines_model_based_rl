@@ -114,26 +114,33 @@ def evaluate_model(model, data_frame, input_col_names, action_col_names, target_
     return dfNet, dfEval
 
 
-def plot_results(input_col_names, action_col_names, dfNet, dfEval, dfDiff,
+def plot_results(target_col_names, action_col_names, dfNet, dfEval, dfDiff,
                  window_size, mean, std, debug):
     # the two for additional plots 1. std and 2. for overall training deviation
-    plot_count = len(input_col_names) + 2
+    plot_count = len(target_col_names) + 2
     fig, axs = plt.subplots(plot_count, 1, figsize=(10, 20))
 
-    for i in range(len(input_col_names)):
-        col_name = input_col_names[i]
-        axs[i].plot(range(len(dfNet)), dfEval[col_name].values[window_size:], label=col_name)
+    for action in action_col_names:
+        axs[0].plot(range(len(dfNet)), dfEval[action].values[window_size:],
+                                   label=action)
+    axs[0].grid()
+    axs[0].legend(loc="best")
 
-        if col_name not in action_col_names:
-            axs[i].plot(range(len(dfNet)), dfNet[col_name].values, label="prediction", ls="--")
+    for i in range(len(target_col_names)):
+        col_name = target_col_names[i]
+        axs[i+1].plot(range(len(dfNet)), dfEval[col_name].values[window_size:], label=col_name)
 
-        axs[i].grid()
-        axs[i].legend(loc="best")
+        axs[i+1].plot(range(len(dfNet)), dfNet[col_name].values, label="prediction", ls="--")
+
+        axs[i+1].grid()
+        axs[i+1].legend(loc="best")
 
     # plot std & mean
-    axs[len(input_col_names)].plot(range(len(dfDiff)), dfDiff.values,
+    axs[plot_count-1].plot(range(len(dfDiff)), dfDiff.values,
                                    label='absolute deviation from training')
-    axs[len(input_col_names)+1].errorbar(range(len(mean)), mean, std, linestyle='None', marker='^')
+    axs[plot_count-1].grid()
+    axs[plot_count-1].legend(loc="best")
+    # axs[len(input_col_names)+1].errorbar(range(len(mean)), mean, std, linestyle='None', marker='^')
     
     if debug:
         plt.show()

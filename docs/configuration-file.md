@@ -105,6 +105,31 @@ second between 3 and 5 and the third between 0 and 3.
 ## Dynamic Model Creation / Training
 TODO
 
+### Validation
+Currently the validation only contains noise configurations that are used later on in the prepare_data function.
+Those configurations determine how the training data is modified to simulate noise. The percentage variable defines
+how much of the data is changed and ranges between 0 and 1. The gaussian normal distribution 
+requires a standard deviation (std) and mean value. If calc_mean is set to true the mean value of a column is calculated and used.
+If set to False however, the mean value of the normal distribution is each column value.
+```yaml
+validation:
+    noise:
+        calc_mean: false
+        std: 0.1
+        percentage: 0.5
+```
+
+### Utility Flags
+The artificial noise decides whether an artificial noise is added to the data.
+```yaml
+utility_flags:
+    log_training: True
+    save: True
+    evaluate_model: True
+    plot_results: True
+    export_model: True
+    artificial_noise: False
+```
 
 ## Model Wrapping
 Configuration for the Model Wrapping is required for three parts of the wrapping: Reward-, Done-,

@@ -100,7 +100,7 @@ def __build_and_train_dynamic_model(df: pd.DataFrame, config: Configuration, pat
         dfDiff = verifier.evaluate_model_with_test_data(model, test_data, input_col_names,
                                                         action_col_names, target_col_names)
         if config.get('dynamic_model.utility_flags.plot_results'):
-            fig = verifier.plot_results(input_col_names, action_col_names, dfNet, dfEval,
+            fig = verifier.plot_results(target_col_names, action_col_names, dfNet, dfEval,
                                         dfDiff, lag, mean_in, std_in, debug)
     model_file_path = None
     if config.get('dynamic_model.utility_flags.save'):

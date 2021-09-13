@@ -13,7 +13,7 @@ example_usage/model_logs_tb/*
 sample_output/*
 
 .idea
-
+pyproject.toml
 __pycache__
 
 venv

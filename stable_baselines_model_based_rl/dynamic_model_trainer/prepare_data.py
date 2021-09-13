@@ -1,4 +1,4 @@
-from stable_baselines_model_based_rl.utils.noise import add_fake_noise, add_gaussian_noise
+from stable_baselines_model_based_rl.utils.noise import add_gaussian_noise
 import tensorflow as tf
 import numpy as np
 import pandas as pd
