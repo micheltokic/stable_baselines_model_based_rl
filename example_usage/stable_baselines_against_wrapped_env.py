@@ -4,6 +4,7 @@ from definitions import ROOT_DIR
 from stable_baselines_model_based_rl.sb_training.stable_baselines_poliy_trainer import \
     train_stable_baselines_policy
 from stable_baselines_model_based_rl.utils.configuration import Configuration
+from stable_baselines_model_based_rl.wrapper.gym_step_handlers import get_step_handler_for_gym_env
 from stable_baselines_model_based_rl.wrapper.wrapped_model_env import WrappedModelEnv
 
 cfg_path = './sample_output/CartPole-v1/loss=0.0002335651806788519-lag=4.00-2021-08-14-13-15-36/config.yaml'
@@ -11,7 +12,8 @@ model_path = './sample_output/CartPole-v1/loss=0.0002335651806788519-lag=4.00-20
 gym_env_name = 'CartPole-v1'
 
 cfg = Configuration(cfg_path)
-env = WrappedModelEnv(model_path, config=cfg)
+step_handler = get_step_handler_for_gym_env(gym_env_name, cfg)
+env = WrappedModelEnv(model_path, config=cfg, step_handler=step_handler)
 env.use_internal_action_format = False
 env.reset()
 
