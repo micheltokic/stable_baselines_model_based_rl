@@ -14,6 +14,7 @@ plugins:
       enabled_if_env: DOCS_PDF_EXPORT
 nav:
   - index.md
+  - installation.md
   - 'Using the Framework':
     - sampling.md
     - dynamic-model-training.md
