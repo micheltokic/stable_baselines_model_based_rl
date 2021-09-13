@@ -1,4 +1,4 @@
-# Create wrapped Gym Environemnt
+# Create wrapped Gym Environment
 The dynamic model that has been created using this library can be wrapped in an gym environment.
 This allows to run any algorithm against it to learn a policy, e.g. with stable baselines.  
 The `WrappedModelEnv` requires the model that is used to predict new states after applying certain
@@ -56,7 +56,9 @@ step_handler = CartPoleStepHandler(config)
 WrappedModelEnv(model_file_path, config, step_handler)
 ```
 
-Also have a look at the scripts in the `example_usage` folder.
+Also have a look at the scripts in the `example_usage` folder. Some example step handlers for
+gym environments are also available in the
+`stable_baselines_model_based_rl.wrapper.gym_step_handlers` module.
 
 ## Reset Handler
 The default reset handler provides a few basic ways to reset an environment. Take a look at the

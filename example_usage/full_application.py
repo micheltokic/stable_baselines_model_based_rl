@@ -11,6 +11,7 @@ import math
 import os
 
 import gym
+from numpy.core.fromnumeric import mean, std
 from stable_baselines3 import PPO
 
 from definitions import ROOT_DIR
@@ -19,8 +20,7 @@ from stable_baselines_model_based_rl.dynamic_model_trainer.training import \
 from stable_baselines_model_based_rl.sampler.gym_sampler import sample_gym_environment
 from stable_baselines_model_based_rl.sb_training.stable_baselines_poliy_trainer import \
     train_stable_baselines_policy
-from stable_baselines_model_based_rl.utils.configuration import Configuration
-from stable_baselines_model_based_rl.wrapper.step_handler import StepRewardDoneHandler
+from stable_baselines_model_based_rl.wrapper.gym_step_handlers import get_step_handler_for_gym_env
 from stable_baselines_model_based_rl.wrapper.wrapped_model_env import WrappedModelEnv
 
 # this is the name of the gym environment to use within this script
@@ -41,30 +41,6 @@ GYM_SAMPLING_SETTINGS = {
 POLICY_TIMESTEPS = 10_000
 
 
-def create_step_handler_for_gym_env(gym_name: str, cfg: Configuration):
-    if gym_name == 'CartPole-v1':
-        class CartPoleStepHandler(StepRewardDoneHandler):
-            def get_done(self, step: int) -> bool:
-                # Angle and x-position at which to fail the episode
-                theta_threshold_radians = 12 * 2 * math.pi / 360
-                x_threshold = 2.4
-
-                cur_state = self.observation.to_value_list()
-                x = cur_state[0]
-                theta = cur_state[2]
-
-                return bool(
-                    x < -x_threshold
-                    or x > x_threshold
-                    or theta < -theta_threshold_radians
-                    or theta > theta_threshold_radians
-                )
-        return CartPoleStepHandler(cfg)
-    else:
-        raise NotImplementedError('This environment has no step handler yet in this'
-                                  'example script!')
-
-
 def sample_create_and_train_ppo(gym_name: str, sample_settings: dict, policy_timesteps: int):
     output_path_sampling = os.path.join(ROOT_DIR, 'sample_output')
     output_path_model = os.path.join(ROOT_DIR, 'sample_output', gym_name)
@@ -73,7 +49,7 @@ def sample_create_and_train_ppo(gym_name: str, sample_settings: dict, policy_tim
                                           sample_settings['max_steps'], output_path_sampling)
     dyn_model, _, model_file_path = build_and_train_dynamic_model(data, config,
                                                                   output_path_model, debug=False)
-    step_handler = create_step_handler_for_gym_env(gym_name, config)
+    step_handler = get_step_handler_for_gym_env(gym_name, config)
     env = WrappedModelEnv(model_file_path, config, step_handler)
     env.use_internal_action_format = False
     env.reset()
@@ -92,7 +68,7 @@ def sample_create_and_train_ppo(gym_name: str, sample_settings: dict, policy_tim
 def apply_ppo_against_gym(gym_name: str, policy_file_path: str, iterations: int):
     loaded_model = PPO.load(policy_file_path)
     framework_env = gym.make(gym_name)
-    max_steps = 0
+    step_counts = []
 
     for i in range(iterations):
         step = 0
@@ -104,11 +80,14 @@ def apply_ppo_against_gym(gym_name: str, policy_file_path: str, iterations: int)
             obs, reward, done, info = framework_env.step(action)
             framework_env.render()
         print(f'Next iteration/episode done after {step} steps...')
-        max_steps = max(step, max_steps)
+        step_counts.append(step)
         framework_env.reset()
         step = 0
     
-    print(f'Maximum amount of steps was: {max_steps}')
+    print(f'Maximum amount of steps was: {max(step_counts)}')
+    print(f'Minimum amount of steps was: {min(step_counts)}')
+    print(f'Mean of amount of steps was: {mean(step_counts)}')
+    print(f'Std of amount of steps was: {std(step_counts)}')
 
 
 if MODE == 'CREATION':

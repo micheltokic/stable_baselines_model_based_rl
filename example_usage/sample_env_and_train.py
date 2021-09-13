@@ -15,4 +15,4 @@ def sample_env_and_train(gym_environment_name, episode_count=300, max_steps=500,
 
 if __name__ == '__main__':
     for name in gym_simple_control_environment_names:
-        sample_env_and_train(name, 10, 100)
+        sample_env_and_train(name)
