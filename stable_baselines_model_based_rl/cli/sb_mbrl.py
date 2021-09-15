@@ -14,7 +14,9 @@ from stable_baselines_model_based_rl.utils.configuration import Configuration
 from stable_baselines_model_based_rl.wrapper.wrapped_model_env import WrappedModelEnv
 
 
-@click.group()
+@click.group(
+    help='Command Line Interface of the "Model Based Reinforcement Learning for Stable Baselines" '
+         'library.')
 @click.option(
     '-c', '--config',
     help='Path to configuration file. If not specified, the config file is assumed to be available'
@@ -25,6 +27,7 @@ from stable_baselines_model_based_rl.wrapper.wrapped_model_env import WrappedMod
     help='Enable some debugging outputs/ features.')
 @click.pass_context
 def sb_mbrl(ctx, config, debug):
+    """Base command (group) of the CLI interface."""
     config_path = os.path.abspath(config)
     try:
         cfg = Configuration(config_path)
@@ -51,6 +54,7 @@ def sb_mbrl(ctx, config, debug):
     help='Max steps per episode to sample.')    
 @click.pass_obj
 def sample(cli_context: CliContext, output_directory, gym_env_name, episodes, max_steps):
+    """CLI command for sampling of a given gym environemnt."""
     if gym_env_name is None:
         gym_env_name = cli_context.config.get('gym_sampling.gym_environment_name', 'CartPole-v1')
     output_directory = os.path.abspath(output_directory)
@@ -74,6 +78,7 @@ def sample(cli_context: CliContext, output_directory, gym_env_name, episodes, ma
          'in the config file is used.')
 @click.pass_obj
 def create_dynamic_model(cli_context: CliContext, output_directory, input_data):
+    """CLI command for creation of a dynamic model for given input data."""
     if input_data is None:
         input_data = cli_context.config.get('input_config.input_file_name', None)
     if input_data is None or not os.path.isfile(input_data):
@@ -115,6 +120,8 @@ def create_dynamic_model(cli_context: CliContext, output_directory, input_data):
 def train_stable_baselines_policy(cli_context: CliContext, model_path, output_directory,
                                   wrapper_step_handler, wrapper_reset_handler,
                                   sb_rl_algorithm, sb_policy, sb_timesteps):
+    """CLI command for creation of a stable baselines policy agains a wrapped gym environment that
+    uses a give dynamic model."""
     if wrapper_step_handler is not None:
         step_handler_module = importlib.import_module(wrapper_step_handler)
         step_handler = step_handler_module.CustomStepHandler(cli_context.config)
