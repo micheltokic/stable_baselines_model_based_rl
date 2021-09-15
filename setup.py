@@ -18,6 +18,7 @@ setup(
     entry_points={
         'console_scripts': [
             'sb-mbrl = stable_baselines_model_based_rl.cli.sb_mbrl:sb_mbrl',
+            'sb-mbrl-eval = stable_baselines_model_based_rl.cli.sb_mbrl_eval:evaluate_sb_policy_against_gym_env',
             'sb-mbrl-obtain-config-file = stable_baselines_model_based_rl.cli.sb_mbrl_obtain_config_file:obtain_config_file',
         ],
     },

@@ -2,8 +2,8 @@ import os
 from datetime import datetime
 
 from gym import Env
-from stable_baselines3 import A2C, PPO
 
+from stable_baselines_model_based_rl.sb_training import get_sb_class_for_algo
 from stable_baselines_model_based_rl.utils.configuration import Configuration
 
 
@@ -28,7 +28,7 @@ def train_stable_baselines_policy(config: Configuration, env: Env, output_dir: s
     policy = config.get('sb_policy.policy', 'MlpPolicy')
     timesteps = config.get('sb_policy.timesteps', 100_000)
 
-    sb_cls = _get_sb_class_for_algo(algo)
+    sb_cls = get_sb_class_for_algo(algo)
     model = sb_cls(policy, env, verbose=(1 if debug else 0))
     model.learn(total_timesteps=timesteps)
 
@@ -43,13 +43,3 @@ def train_stable_baselines_policy(config: Configuration, env: Env, output_dir: s
         print(f'Stable Baselines Model/Policy has been exported to: {export_path}')
 
     return model
-
-
-def _get_sb_class_for_algo(algo: str):
-    if algo == 'AC2':
-        return A2C
-    elif algo == 'PPO':
-        return PPO
-    else:
-        raise NotImplementedError(f'The {algo} sb algorithm is not yet supported, you can, '
-                                  'however, create and train the policy manually!')
