@@ -25,6 +25,7 @@ version!) and provide methods for calculating reward and the done state. For thi
 overwrite the `get_reward` and `get_done` method. It is ok to only overwrite one method and use
 the default implementation for the other one. Both methods receive the current step number as
 argument. Additionally, the step handler has access to the following for object/class variables:
+
 - `self.observation`: The current observation of the environment.
 - `self.action`: The last action performed, i.e., the action that lead to the current observation.
 - `self.observation_history`: A list (history) with all former observations.
