@@ -6,26 +6,28 @@ import numpy as np
 import pandas as pd
 
 
-def evaluate_model_with_test_data(model, test_data, input_col_names, action_col_names, target_col_names):
+def evaluate_model_with_test_data(model, test_data, input_col_names, action_col_names,
+                                  target_col_names, lag):
     eval_test_data = test_data.copy()
     eval_test_data.describe()
 
     # FIFO-buffer that keeps the neural state
-    stateBuffer = collections.deque()
+    stateBuffer = collections.deque(maxlen=lag)
 
     # outputs of neural network will be stored here
     d = {"EPISODE": [], "STEP": []}
     d.update({col_name: [] for col_name in input_col_names})
-    dfNet = pd.DataFrame(data=d) # holds predictions
+    dfNet = pd.DataFrame(data=d)  # holds predictions
 
     len_test_data = len(test_data)
     for i in range(0, len_test_data):
 
         # estimation of first state
-        if i == 0:
-            state_data = np.float64([eval_test_data[input_col_names[j]].values[i] for j in range(0, len(input_col_names))])
+        if i < lag:
+            state_data = np.float64([eval_test_data[input_col_names[j]].values[i]
+                                     for j in range(0, len(input_col_names))])
             stateBuffer.append(state_data)
-        
+
         # predict successor state
         else:
 
@@ -34,11 +36,12 @@ def evaluate_model_with_test_data(model, test_data, input_col_names, action_col_
             netOutput = model.predict(np.float64(state))[0]
 
             # append plotting data
-            dfNet = dfNet.append({target_col_names[j]: netOutput[j] for j in range(0, len(target_col_names))}
-                                 , ignore_index=True)
+            dfNet = dfNet.append({target_col_names[j]: netOutput[j]
+                                  for j in range(0, len(target_col_names))}, ignore_index=True)
 
             # update RNN state
-            dfEval_actions = np.float64([eval_test_data[action_col_name].values[i] for action_col_name in action_col_names])
+            dfEval_actions = np.float64([eval_test_data[action_col_name].values[i]
+                                         for action_col_name in action_col_names])
             stateBuffer.append(np.concatenate((dfEval_actions, netOutput)))
 
     # first normalize all observation data for comparisons later on
