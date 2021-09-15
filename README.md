@@ -1,6 +1,8 @@
 # Model Based Reinforcement Learning for Stable Baselines
 A model based RL extension for stable baselines.
 
+**User Documentation**: https://micheltokic.github.io/stable_baselines_model_based_rl/
+
 ## Development
 For development, clone this repository and install requirements via pip:
 ```
