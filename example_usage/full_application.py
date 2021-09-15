@@ -18,7 +18,7 @@ from definitions import ROOT_DIR
 from stable_baselines_model_based_rl.dynamic_model_trainer.training import \
     build_and_train_dynamic_model
 from stable_baselines_model_based_rl.sampler.gym_sampler import sample_gym_environment
-from stable_baselines_model_based_rl.sb_training.stable_baselines_poliy_trainer import \
+from stable_baselines_model_based_rl.sb_training.stable_baselines_policy_trainer import \
     train_stable_baselines_policy
 from stable_baselines_model_based_rl.wrapper.gym_step_handlers import get_step_handler_for_gym_env
 from stable_baselines_model_based_rl.wrapper.wrapped_model_env import WrappedModelEnv

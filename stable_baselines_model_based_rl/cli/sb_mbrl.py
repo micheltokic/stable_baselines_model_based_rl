@@ -8,7 +8,7 @@ from stable_baselines_model_based_rl.cli.context import CliContext
 from stable_baselines_model_based_rl.dynamic_model_trainer.training import \
     build_and_train_dynamic_model
 from stable_baselines_model_based_rl.sampler import gym_sampler
-from stable_baselines_model_based_rl.sb_training.stable_baselines_poliy_trainer import \
+from stable_baselines_model_based_rl.sb_training.stable_baselines_policy_trainer import \
     train_stable_baselines_policy as sb_trainer
 from stable_baselines_model_based_rl.utils.configuration import Configuration
 from stable_baselines_model_based_rl.wrapper.wrapped_model_env import WrappedModelEnv
