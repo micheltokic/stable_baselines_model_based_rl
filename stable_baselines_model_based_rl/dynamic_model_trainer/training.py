@@ -95,13 +95,15 @@ def __build_and_train_dynamic_model(df: pd.DataFrame, config: Configuration, pat
 
     fig = None
     if config.get('dynamic_model.utility_flags.evaluate_model'):
+        print('Starting model evaluation...')
         dfNet, dfEval = verifier.evaluate_model(model, df, input_col_names, action_col_names,
                                                 target_col_names, lag)
+        print('Starting test data evaluation...')
         dfDiff = verifier.evaluate_model_with_test_data(model, test_data, input_col_names,
                                                         action_col_names, target_col_names, lag)
         if config.get('dynamic_model.utility_flags.plot_results'):
             fig = verifier.plot_results(target_col_names, action_col_names, dfNet, dfEval,
-                                        dfDiff, lag, mean_in, std_in, debug)
+                                        dfDiff, lag, debug)
     model_file_path = None
     if config.get('dynamic_model.utility_flags.save'):
         model_file_path, _ = verifier.save(output_path, model, fig, config, df, debug)
