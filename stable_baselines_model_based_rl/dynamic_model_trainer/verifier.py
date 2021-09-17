@@ -134,10 +134,10 @@ def evaluate_model(model, data_frame, input_col_names, action_col_names, target_
     return dfNet, dfEval
 
 
-def plot_results(target_col_names, action_col_names, dfNet, dfEval, dfDiff, window_size, debug):
+def plot_results(target_col_names, action_col_names, dfNet, dfEval, dfDiff, window_size):
     # the two for additional plots 1. std and 2. for overall training deviation
     plot_count = len(target_col_names) + 2
-    fig, axs = plt.subplots(plot_count, 1, figsize=(10, 20))
+    fig, axs = plt.subplots(plot_count, 1, figsize=(10, plot_count * 5))
 
     for action in action_col_names:
         axs[0].plot(range(len(dfNet)), dfEval[action].values[window_size:],
@@ -158,9 +158,6 @@ def plot_results(target_col_names, action_col_names, dfNet, dfEval, dfDiff, wind
     axs[plot_count-1].plot(range(len(dfDiff)), dfDiff, label='absolute deviation from training')
     axs[plot_count-1].grid()
     axs[plot_count-1].legend(loc="best")
-    
-    if debug:
-        plt.show()
 
     return fig
 
