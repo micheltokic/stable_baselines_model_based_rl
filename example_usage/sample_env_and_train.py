@@ -10,7 +10,7 @@ def sample_env_and_train(gym_environment_name, episode_count=300, max_steps=500,
     output_path_model = os.path.join(ROOT_DIR, 'sample_output', gym_environment_name)
 
     data, config = sample_gym_environment(gym_environment_name, episode_count,
-                                          max_steps, output_path_sampling)
+                                          max_steps, output_path_sampling, debug)
     training.build_and_train_dynamic_model(data, config, output_path_model, debug)
 
 if __name__ == '__main__':

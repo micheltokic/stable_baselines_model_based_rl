@@ -63,7 +63,8 @@ def sample(cli_context: CliContext, output_directory, gym_env_name, episodes, ma
             gym_environment_name=gym_env_name,
             episode_count=episodes,
             max_steps=max_steps,
-            output_path=os.path.abspath(output_directory))
+            output_path=os.path.abspath(output_directory),
+            debug=cli_context.debug)
     except Exception as e:
         click.echo(f'Could not sample environment: {e}')
     else:

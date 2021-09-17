@@ -92,7 +92,8 @@ def __sample_gym_environment(gym_environment_name: str, data_file: str, episode_
 
 
 def sample_gym_environment(gym_environment_name: str, episode_count=20, max_steps=100,
-                           output_path=os.path.join(ROOT_DIR, 'sample_output')):
+                           output_path=os.path.join(ROOT_DIR, 'sample_output'),
+                           debug: bool = False):
     """
     Sample the given gym environment with the given amount of episodes and maximum
     steps per episode.
@@ -103,22 +104,25 @@ def sample_gym_environment(gym_environment_name: str, episode_count=20, max_step
         environment, based on the sample_config.yaml file.
 
     Both files are stored within the output_path directory. They will be subfolders of directories
-    containing the gym environment name and the current time. E.g.
-    "CartPole-v1/2021-05-01-10-00-30/data.csv".
+    containing the gym environment name and the current time. E.g. the follwoing folder structure
+    will be created within output_path: "CartPole-v1/sample_data/2021-05-01-10-00-30/data.csv".
 
     Args:
         gym_environment_name: Name of the Gym-Environment to sample.
         epsiode_count: Amount of episodes to use for the sampling.
         max_steps: Maximum steps per episode allowed during sampling.
         output_path: The directory the generated files are stored in.
+        debug: Flag whether to enable debugging features, such as naming the output folder based
+            on the amount of episodes and max steps.
 
     Returns:
         data_file: Path to the created data (csv) file.
         config: Configuration object created for the sampled environment.
     """
 
-    final_dir_name = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
-    final_dir_path = os.path.join(output_path, gym_environment_name, final_dir_name)
+    time = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
+    dest_dir_name = time if not debug else f'{time}_episodes={episode_count}_max-step={max_steps}'
+    final_dir_path = os.path.join(output_path, gym_environment_name, 'sample_data', dest_dir_name)
     os.makedirs(final_dir_path)
 
     data_file = f'{final_dir_path}/data.csv'

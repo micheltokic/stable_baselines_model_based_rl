@@ -46,7 +46,8 @@ def sample_create_and_train_ppo(gym_name: str, sample_settings: dict, policy_tim
     output_path_model = os.path.join(ROOT_DIR, 'sample_output', gym_name)
 
     data, config = sample_gym_environment(gym_name, sample_settings['episodes'],
-                                          sample_settings['max_steps'], output_path_sampling)
+                                          sample_settings['max_steps'], output_path_sampling,
+                                          debug=True)
     dyn_model, _, model_file_path = build_and_train_dynamic_model(data, config,
                                                                   output_path_model, debug=False)
     step_handler = get_step_handler_for_gym_env(gym_name, config)
