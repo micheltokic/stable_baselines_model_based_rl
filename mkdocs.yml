@@ -1,4 +1,5 @@
 site_name: Stable Baselines - Model Based Reinforcement Learning
+site_url: https://micheltokic.github.io/stable_baselines_model_based_rl/
 theme:
   name: material
   features:
