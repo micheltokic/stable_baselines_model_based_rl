@@ -108,3 +108,22 @@ sb-mbrl train-stable-baselines-policy \
 ### Custom Reset Handler
 This works the same way as for custom step handlers, just use the `--wrapper-reset-handler` flag.
 The handler class must be named **CustomResetHandler**.
+
+
+## Testing Stable Baselines Policy
+**Usage**: `sb-mbrl-eval [OPTIONS] SB_ALGORITHM POLICY_PATH GYM_ENV_NAME`.
+
+This command allows you the evaluate a given (exported) stable baselines policy (path to exported
+model given with the `POLICY_PATH` argument) against the original gym environment. The name of the
+gym environment must be given as the `GYM_ENV_NAME` argument, as well as the policy that was used,
+like "PPO", or "AC2".
+
+An optional option `--episodes` lets you define how many episodes should be run.
+
+After all episodes have been run, a short summary will be printed. It looks like this:
+```
+Maximum amount of steps was: 169
+Minimum amount of steps was: 103
+Mean of amount of steps was: 127.32
+Std of amount of steps was: 14.338674973650807
+```
