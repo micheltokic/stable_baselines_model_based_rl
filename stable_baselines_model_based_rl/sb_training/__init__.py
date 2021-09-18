@@ -3,6 +3,7 @@ from stable_baselines3.common.base_class import BaseAlgorithm
 
 
 def get_sb_class_for_algo(algo: str) -> BaseAlgorithm:
+    """Get the corresponding stable baselines class for the given algorithm name."""
     if algo == 'AC2':
         return A2C
     elif algo == 'DDPG':

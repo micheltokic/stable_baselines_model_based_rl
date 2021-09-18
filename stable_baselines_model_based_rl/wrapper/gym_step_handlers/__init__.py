@@ -10,6 +10,9 @@ from stable_baselines_model_based_rl.wrapper.step_handler import StepRewardDoneH
 
 
 def get_step_handler_for_gym_env(gym_env_name: str, cfg: Configuration) -> StepRewardDoneHandler:
+    """Return an example step handler for the given gym environemtn name, that uses the
+    given config file."""
+
     if gym_env_name == 'Acrobot-v1':
         handler = AcrobotStepHandler(cfg)
     elif gym_env_name == 'CartPole-v1':

@@ -1,5 +1,4 @@
 import collections
-from stable_baselines_model_based_rl.wrapper.reset_handler import ResetHandler
 from typing import Any, Tuple
 
 import gym
@@ -10,10 +9,12 @@ from gym.spaces.discrete import Discrete
 from gym.spaces.space import Space
 
 from stable_baselines_model_based_rl.utils.configuration import Configuration
-from stable_baselines_model_based_rl.utils.spaces.base import SpaceType, SpaceValue, generate_gym_box_space
+from stable_baselines_model_based_rl.utils.spaces.base import (SpaceType, SpaceValue,
+                                                               generate_gym_box_space)
 from stable_baselines_model_based_rl.utils.spaces.box import BoxSpaceValue
 from stable_baselines_model_based_rl.utils.spaces.discrete import DiscreteSpaceValue
 from stable_baselines_model_based_rl.utils.spaces.factory import space_value_from_gym
+from stable_baselines_model_based_rl.wrapper.reset_handler import ResetHandler
 from stable_baselines_model_based_rl.wrapper.step_handler import StepRewardDoneHandler
 
 

@@ -8,6 +8,7 @@ from gym.spaces.box import Box
 
 
 class SpaceType(Enum):
+    """Enumeration of different space types (action and observation)."""
     ACTION = 1
     OBSERVATION = 2
 
