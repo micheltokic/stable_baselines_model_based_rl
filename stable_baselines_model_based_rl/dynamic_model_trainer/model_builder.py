@@ -5,22 +5,30 @@ from keras.models import Sequential
 import tensorflow as tf
 
 
-def build_dynamic_model(model_config, input_shape, mean_in, std_in, mean_out, std_out, output_len, optimizer, loss):
+def build_dynamic_model(model_config, input_shape, mean_in, std_in, mean_out, std_out, output_len,
+                        optimizer):
     """
-    Creates and compiles a neural network consisting of a 'Long Short Term Memory' layer followed by a 'Dense' layer.
+    Creates and compiles a neural network consisting of a 'Long Short Term Memory' layer followed
+    by a 'Dense' layer. Additionally, two Keras/Tensorflow Lambda layers are used for normalization
+    of data (and "reverting" of the normalization).
 
     Args:
-        model_config: dictionary containing the model building configuration
-        output_len: Length of the output vector
-        optimizer: Optimizer used optimizing gradient descent
-        loss: loss function used calculating the error
+        model_config: Dictionary containing the model building configuration.
+        input_shape: Shape of the input (first layer).
+        mean_in: Mean of input data.
+        std_in: Standard deviation of input data.
+        mean_out: Mean of output data.
+        std_out: Standard deviation of output data.
+        output_len: Length of the output vector ("output shape").
+        optimizer: Optimizer used optimizing gradient descent.
 
     Returns:
         dynamic_model: Compiled tensorflow model with architecture given in the model_config dictionary
     """
 
     yaml_model_config = yaml.dump(model_config)
-    dynamic_model: Sequential = keras.models.model_from_yaml(yaml_model_config, custom_objects=None)
+    dynamic_model: Sequential = keras.models.model_from_yaml(yaml_model_config,
+                                                             custom_objects=None)
     layers = dynamic_model.layers
 
     while True:

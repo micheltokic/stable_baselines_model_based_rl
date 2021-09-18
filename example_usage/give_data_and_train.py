@@ -8,7 +8,7 @@ from stable_baselines_model_based_rl.utils.configuration import Configuration
 def give_data_and_train(gym_environment_name, data_path, config_path):
     config = Configuration(config_path)
     output_path_model = os.path.join(ROOT_DIR, 'sample_output', gym_environment_name)
-    training.build_and_train_dynamic_model(data_path, config, output_path_model)
+    training.build_and_train_dynamic_model(data_path, config, output_path_model, debug=True)
 
 
 if __name__ == '__main__':

@@ -1,8 +1,6 @@
 from stable_baselines_model_based_rl.utils.noise import add_gaussian_noise
 import tensorflow as tf
 import numpy as np
-import pandas as pd
-from keras.layers import Dense, Normalization
 
 
 def prepare_data(df, input_col, target_col, window_size, config, training_batch_size=10, validation_batch_size=10,
@@ -37,7 +35,7 @@ def prepare_data(df, input_col, target_col, window_size, config, training_batch_
         df = add_gaussian_noise(df, target_col, **noise_settings)
 
     ((x_train_multi, y_train_multi), (x_val_multi, y_val_multi)), test_data, mean_in, std_in, mean_out, std_out = \
-        __create_training_data(df, input_col, target_col, config, window_size=window_size,
+        __create_training_data(df, input_col, target_col, window_size=window_size,
                                training_pattern_percent=training_pattern_percent)
 
     print('trainData: Single window of past history : {}'.format(x_train_multi[0].shape))
@@ -48,7 +46,6 @@ def prepare_data(df, input_col, target_col, window_size, config, training_batch_
     print('valData: number of trainingsexamples: {}'.format(x_val_multi.shape))
 
     train_data = tf.data.Dataset.from_tensor_slices((x_train_multi, y_train_multi))
-    # train_data = train_data.cache().shuffle(max_training_pattern).batch(training_batch_size).repeat()
     train_data = train_data.shuffle(x_train_multi.shape[0]).batch(training_batch_size).repeat()
 
     val_data = tf.data.Dataset.from_tensor_slices((x_val_multi, y_val_multi))
@@ -57,13 +54,11 @@ def prepare_data(df, input_col, target_col, window_size, config, training_batch_
     return train_data, val_data, test_data, input_shape, mean_in, std_in, mean_out, std_out
 
 
-def __create_training_data(data, input_col, target_col, config, window_size=1, training_pattern_percent=0.7):
+def __create_training_data(data, input_col, target_col, window_size=1, training_pattern_percent=0.7):
     data_train = data
 
     mean_in, std_in = __mean_and_std(input_col, data_train)
     mean_out, std_out = __mean_and_std(target_col, data_train)
-    # data_plot.plot_hist_df(data_train, input_col)
-    # data_plot.plot_timeseries_df(data_train, input_col)
 
     print(f"mean out =  {mean_out}")
     print(f"std out = {std_out}")
@@ -73,27 +68,14 @@ def __create_training_data(data, input_col, target_col, config, window_size=1, t
 
     grouped = data_train.groupby(['EPISODE'])
 
-    columns = data_train.columns
-
     # extract 5 percent of entries for testing
     length = len(data_train)
     test_split = int(0.05 * length)
     test_data = data_train[:test_split] 
     data_train = data_train.iloc[test_split:]
 
-    # Custom Normalization
-    # data_train = __normalize(data_train, target_col, config)
-
-    #layer = Normalization()
-    #train_df = __get_observation_df(data_train, target_col)
-    #layer.adapt(train_df)
-
-    # data_train = pd.DataFrame(data_train, columns=columns)
-
     mean_in, std_in = __mean_and_std(input_col, data_train)
     mean_out, std_out = __mean_and_std(target_col, data_train)
-    # data_plot.plot_hist_df(data_train, input_col)
-    # data_plot.plot_timeseries_df(data_train, input_col)
     print(f"mean in = {mean_in}")
     print(f"std in = {std_in}")
 
@@ -101,21 +83,19 @@ def __create_training_data(data, input_col, target_col, config, window_size=1, t
     labels_all = []
 
     for g in grouped:
-        # be sure that data inside a group is not shuffled # not sure if needed
+        # be sure that data inside a group is not shuffled
         g = g[1].sort_values(by='STEP')
 
         past_history = window_size  # t-3, t-2, t-1, t
         future_target = 0  # t+1
         STEP = 1  # no subsampling of rows in data, e.g. only every i'th row
 
-        # use pandas.DataFrame.values in order to get an numpy array from an pandas.DataFrame object
-
         input, labels = __multivariate_data(dataset=g[input_col][:].values, target=g[target_col][:].values,
                                             start_index=0, end_index=g[input_col][:].values.shape[0] - future_target,
                                             history_size=past_history, target_size=future_target, step=STEP,
                                             single_step=True)
 
-        ## Append data to whole set of patterns
+        # Append data to whole set of patterns
         for i in range(0, len(input)):
             inputs_all.append(input[i])
             labels_all.append(labels[i])
@@ -170,20 +150,3 @@ def __multivariate_data(dataset, target, start_index, end_index, history_size,
             labels.append(target[i:i + target_size])
 
     return np.array(data), np.array(labels)
-
-
-def __normalize(df, columns, config):
-    result = df.copy()
-    normalization_info = {}
-    for feature_name in columns:
-        avg = np.average(df[feature_name])
-        std = np.std(df[feature_name])
-        normalization_info[feature_name] = (avg, std)
-        result[feature_name] = (df[feature_name] - avg) / std
-
-    config.set("normalization", normalization_info)
-    return result
-
-
-def __get_observation_df(df, columns):
-    return df[columns]

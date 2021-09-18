@@ -5,10 +5,9 @@ import keras
 import pandas as pd
 
 from definitions import ROOT_DIR
-from stable_baselines_model_based_rl.dynamic_model_trainer import prepare_data, model_builder, verifier
+from stable_baselines_model_based_rl.dynamic_model_trainer import (model_builder, prepare_data,
+                                                                   verifier)
 from stable_baselines_model_based_rl.utils.configuration import Configuration
-
-import stable_baselines_model_based_rl.sampler.gym_sampler as sampler
 
 
 def build_and_train_dynamic_model(data_path, config: Configuration, output_path=ROOT_DIR,
@@ -28,9 +27,6 @@ def build_and_train_dynamic_model(data_path, config: Configuration, output_path=
         model: The model trained on the given dataset
         output_path: The path were everything has been stored
         model_file_path: The path to the exported model file (None, if it shouldn't be exported)
-
-    Todo:
-        evaluation, plotting configuration into yaml file?
     """
     df = pd.read_csv(data_path)
     return __build_and_train_dynamic_model(df, config, output_path, debug)
@@ -47,11 +43,9 @@ def __build_and_train_dynamic_model(df: pd.DataFrame, config: Configuration, pat
     validation_steps = config.get('dynamic_model.training.validation_steps', 100)
     validation_freq = config.get('dynamic_model.training.validation_freq', 1)
     optimizer = keras.optimizers.get(config.get('dynamic_model.training.optimizer', 'RMSprop'))
-    loss = keras.losses.get(config.get('dynamic_model.training.loss', 'mse'))
     batch_size = config.get('dynamic_model.training.batch_size', 64)
     lag = config.get('dynamic_model.training.lag', 4)
     patience = config.get('dynamic_model.training.patience', 15)
-    # optimizer.learning_rate.assign(config.get('dynamic_model.training.learning_rate', 0.1))
 
     artificial_noise = config.get('dynamic_model.utility_flags.artificial_noise', False)
     noise_settings = config.get('dynamic_model.validation.noise') if artificial_noise else {}
@@ -84,7 +78,7 @@ def __build_and_train_dynamic_model(df: pd.DataFrame, config: Configuration, pat
 
     model = model_builder.build_dynamic_model(config.get('dynamic_model.keras_model'), input_shape,
                                               mean_in, std_in, mean_out, std_out,
-                                              len(target_col_names), optimizer, loss)
+                                              len(target_col_names), optimizer)
 
     history = model.fit(train_data, epochs=max_epochs, steps_per_epoch=steps_per_epoch,
                         validation_data=val_data, validation_steps=validation_steps,

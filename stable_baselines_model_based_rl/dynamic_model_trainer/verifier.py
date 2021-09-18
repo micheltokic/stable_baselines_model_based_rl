@@ -135,6 +135,8 @@ def evaluate_model(model, data_frame, input_col_names, action_col_names, target_
 
 
 def plot_results(target_col_names, action_col_names, dfNet, dfEval, dfDiff, window_size):
+    """Create a evaluation plot for given data."""
+
     # the two for additional plots 1. std and 2. for overall training deviation
     plot_count = len(target_col_names) + 2
     fig, axs = plt.subplots(plot_count, 1, figsize=(10, plot_count * 5))
@@ -163,6 +165,20 @@ def plot_results(target_col_names, action_col_names, dfNet, dfEval, dfDiff, wind
 
 
 def save(final_dir_path, model, fig, config, df, debug):
+    """Save given data to given final_dir_path.
+
+    In debug mode, the config file and the df (DataFram = data) are stored, additionally.
+
+    Args:
+        final_dir_path: Output directory to store the data to.
+        model: Keras Model to export (It'll be only exported, if the corresponding config setting
+            ("dynamic_model.utility_flags.export_model") is set to True).
+        fig: Figure to export (optionally, otherwise None).
+        config: Configuration.
+        df: DataFrame containing the data the model was created with
+        debug: Debug Flag: controlls whether df and config are addtionally exported.
+    """
+
     # store input data in debug mode in model output folder as well
     if debug:
         df.to_csv(os.path.join(final_dir_path, 'data.csv'), sep=',', encoding='utf-8', index=False)

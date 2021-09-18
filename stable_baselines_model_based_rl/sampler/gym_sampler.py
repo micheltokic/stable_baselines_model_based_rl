@@ -48,7 +48,6 @@ def __sample_gym_environment(gym_environment_name: str, data_file: str, episode_
     config = Configuration(os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                         '../../example_usage/sample_config.yaml'))
     env = gym.make(gym_environment_name)
-    # for details see: https://github.com/openai/gym/blob/master/gym/envs/classic_control/cartpole.py
     env.np_random.seed(0)
     env.action_space.np_random.seed(0)
 

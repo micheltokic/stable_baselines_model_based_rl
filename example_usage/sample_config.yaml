@@ -38,7 +38,6 @@ dynamic_model:
         max_epochs: 50
         steps_per_epoch: 1000
         learning_rate: 0.05
-        loss: mse   # Mean squared error
         optimizer: adam
         batch_size: 64
         patience: 15    # Epochs in which no learning success is achieved, after which the training is discontinued
