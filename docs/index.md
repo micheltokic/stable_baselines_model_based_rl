@@ -35,7 +35,8 @@ of this library
   model with given input data.
 - `model_wrapping.py`: Demonstration of how to wrap a dynamic model as gym
   environment.
-- `multiple_tests.py`: TODO
+- `multiple_tests.py`: Test-Creations of dynamic models for different sampled gym
+  environments for **different learning rates and batch sizes**.
 - `sample_config.yaml`: This is the example/base configuration file for the library.
 - `sample_env.py`: Demonstration of how to sample a gym environment.
 - `sample_env_and_train.py`: Simple script that samples and trains a respective
