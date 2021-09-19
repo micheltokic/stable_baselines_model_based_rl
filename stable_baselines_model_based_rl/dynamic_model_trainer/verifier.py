@@ -167,7 +167,7 @@ def plot_results(target_col_names, action_col_names, dfNet, dfEval, dfDiff, wind
 def save(final_dir_path, model, fig, config, df, debug):
     """Save given data to given final_dir_path.
 
-    In debug mode, the config file and the df (DataFram = data) are stored, additionally.
+    In debug mode, the config file and the df (DataFrame = data) are stored, additionally.
 
     Args:
         final_dir_path: Output directory to store the data to.

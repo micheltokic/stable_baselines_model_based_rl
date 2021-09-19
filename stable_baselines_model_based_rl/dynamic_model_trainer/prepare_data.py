@@ -3,7 +3,7 @@ import tensorflow as tf
 import numpy as np
 
 
-def prepare_data(df, input_col, target_col, window_size, config, training_batch_size=10, validation_batch_size=10,
+def prepare_data(df, input_col, target_col, window_size, training_batch_size=10, validation_batch_size=10,
                  training_pattern_percent=0.7, noise_settings={}):
     """
     Reads the data of the data frame,
