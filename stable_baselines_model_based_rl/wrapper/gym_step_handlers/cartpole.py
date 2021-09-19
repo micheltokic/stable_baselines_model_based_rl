@@ -19,11 +19,3 @@ class CartPoleStepHandler(StepRewardDoneHandler):
             or theta < -theta_threshold_radians
             or theta > theta_threshold_radians
         )
-
-    def get_reward(self, step: int) -> int:
-        return 1
-
-
-
-
-
