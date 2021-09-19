@@ -59,7 +59,7 @@ def __build_and_train_dynamic_model(df: pd.DataFrame, config: Configuration, pat
         prepare_data.prepare_data(df, input_col_names, target_col_names,
                                   window_size=lag,
                                   training_pattern_percent=train_test_ration,
-                                  noise_settings=noise_settings, config=config)
+                                  noise_settings=noise_settings)
 
     callbacks = [keras.callbacks.EarlyStopping(monitor="loss", patience=patience,
                                                restore_best_weights=True, verbose=True)]
