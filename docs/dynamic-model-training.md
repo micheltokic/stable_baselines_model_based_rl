@@ -1,5 +1,6 @@
 # Dynamic Model Training/Creation
-##Process
+
+## Process
 The `dynamic_model_trainer.training` module is used to create and train a dynamic model of a gym environment. The module contains a single method `build_and_train_dynamic_model` that triggers the following process:
 
 **1. Prepare data**
@@ -25,7 +26,9 @@ In a final step, the training process is reviewed. For this purpose, methods are
 **5. Save the dynamic model**
 
 
-##Example Usage
+## Example Usage
+
 ```python
 config = Configuration('path_to_config')
 training.build_and_train_dynamic_model('path_to_csv', config, 'path_to_output')
+```

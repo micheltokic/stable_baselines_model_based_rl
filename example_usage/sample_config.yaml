@@ -68,12 +68,6 @@ dynamic_model:
 # Model Wrapping
 #
 model_wrapping:
-    reward:
-        type: CONSTANT  # one of CONSTANT, EVAL, or HANDLER
-        value: 1.0
-    done:
-        type: CONSTANT  # one of CONSTANT, EVAL, or HANDLER
-        value: 200
     reset:
         type: RANDOM  # one of RANDOM, STATIC, EPISODE_START, or HANDLER
         value:
