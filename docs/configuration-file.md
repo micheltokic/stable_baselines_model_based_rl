@@ -103,7 +103,46 @@ second between 3 and 5 and the third between 0 and 3.
 
 
 ## Dynamic Model Creation / Training
-TODO
+
+### Training
+The `dynamic_model.training` section configures how the training of the dynamic model is
+performed:
+
+```yaml
+dynamic_model:
+    training:
+        train_test_ration: 0.7  # 0.7: 70% of the data is used for training, 30% for testing
+        lag: 4
+        validation_steps: 100
+        validation_freq: 1
+        max_epochs: 50
+        steps_per_epoch: 1000
+        learning_rate: 0.05
+        optimizer: adam
+        batch_size: 64
+        patience: 15  # Epochs in which no learning success is achieved, after which the training is discontinued
+```
+
+For more details the [corresponding Keras Documentation](https://keras.io/api/models/model_training_apis/)
+might be helpful, too.
+
+### Keras Model Configuration
+Internally, for the creation of the tensorflow model the `tf.keras.models.model_from_yaml`
+method is used. Thus, you can configure your network architecture easily by providing a
+proper configuration. (Also see the
+[Keras Docs](https://www.tensorflow.org/api_docs/python/tf/keras/models/model_from_yaml).)
+
+```yaml
+dynamic_model:
+    keras_model: 
+        class_name: Sequential
+        config:
+            name: 'my_net'
+            layers:
+            - class_name: LSTM
+              config:
+                units: 50
+```
 
 ### Validation
 Currently the validation only contains noise configurations that are used later on in the prepare_data function.
@@ -112,23 +151,25 @@ how much of the data is changed and ranges between 0 and 1. The gaussian normal 
 requires a standard deviation (std) and mean value. If calc_mean is set to true the mean value of a column is calculated and used.
 If set to False however, the mean value of the normal distribution is each column value.
 ```yaml
-validation:
-    noise:
-        calc_mean: false
-        std: 0.1
-        percentage: 0.5
+dynamic_model:
+    validation:
+        noise:
+            calc_mean: false
+            std: 0.1
+            percentage: 0.5
 ```
 
 ### Utility Flags
 The artificial noise decides whether an artificial noise is added to the data.
 ```yaml
-utility_flags:
-    log_training: True
-    save: True
-    evaluate_model: True
-    plot_results: True
-    export_model: True
-    artificial_noise: False
+dynamic_model:
+    utility_flags:
+        log_training: True
+        save: True
+        evaluate_model: True
+        plot_results: True
+        export_model: True
+        artificial_noise: False
 ```
 
 ## Model Wrapping

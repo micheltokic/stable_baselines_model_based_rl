@@ -83,3 +83,19 @@ details.
 After you have initialized the wrapped gym environment, you can use it like any other gym
 environment, too. E.g., you can train a stable baselines policy against it.  
 For examples, checkout the `example_usage` directory.
+
+The following is an example of wrapping a dynamic model that trained the CartPole-v1
+environemnt. The custom step handler listed above is used.
+
+```python
+# Initialization
+model_file_path = './path/to/model.h5'
+config = Configuration('./path/to/config.yaml')
+step_handler = CartPoleStepHandler(config)
+
+env = WrappedModelEnv(model_file_path, config, step_handler=step_handler)
+env.reset()
+
+# Usage
+observation, reward, done, info = env.step(1)
+```

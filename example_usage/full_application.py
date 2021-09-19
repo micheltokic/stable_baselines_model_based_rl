@@ -27,10 +27,10 @@ GYM_ENV = 'CartPole-v1'
 # set this mode to either create the stable baselines policy (+ sampling, dynamic model creation,
 # model wrapping, etc.) or to load an already created policy (file) and apply it against the
 # original gym environment
-MODE = 'CREATION'  # one of 'CREATION' or 'APPLICATION'
+MODE = 'APPLICATION'  # one of 'CREATION' or 'APPLICATION'
 
 # Path to the policy file (created in the CREATION step)
-POLICY_FILE = None
+POLICY_FILE = 'D:/Daten/Development/stable_baselines_model_based_rl/sample_output/CartPole-v1/stable_baselines_models/WrappedModelEnv_PPO_MlpPolicy_2021-09-13-21-03-41.zip'
 # Settings for the gym sampling
 GYM_SAMPLING_SETTINGS = {
     'episodes': 500,
