@@ -1,9 +1,13 @@
 site_name: Stable Baselines - Model Based Reinforcement Learning
 site_url: https://micheltokic.github.io/stable_baselines_model_based_rl/
+repo_url: https://github.com/micheltokic/stable_baselines_model_based_rl
+repo_name: Project on GitHub
 theme:
   name: material
   features:
     - navigation.expand
+    - navigation.instant
+    - navigation.tabs
 plugins:
   - awesome-pages
   - search
@@ -14,15 +18,18 @@ plugins:
       output_path: ./stable-baselines-model-based-rl-DOCS.pdf
       enabled_if_env: DOCS_PDF_EXPORT
 nav:
-  - index.md
-  - installation.md
-  - 'Using the Framework':
-    - sampling.md
-    - dynamic-model-training.md
-    - environment-wrapping.md
-    - policy-training.md
-  - configuration-file.md
-  - cli.md
+  - 'Documentation':
+    - index.md
+    - installation.md
+    - 'Using the Framework':
+      - sampling.md
+      - dynamic-model-training.md
+      - environment-wrapping.md
+      - policy-training.md
+    - configuration-file.md
+    - cli.md
   - ...
 markdown_extensions:
   - pymdownx.critic
+  - pymdownx.highlight
+  - pymdownx.superfences
